@@ -1,0 +1,8 @@
+name: ANFT
+version: '${project.version}'
+main: me.xflyiwnl.anft.ANFT
+api-version: '1.16'
+
+commands:
+  anft:
+    description: "cmd"

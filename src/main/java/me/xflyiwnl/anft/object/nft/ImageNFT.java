@@ -1,4 +1,4 @@
-package me.xflyiwnl.anft.object;
+package me.xflyiwnl.anft.object.nft;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;

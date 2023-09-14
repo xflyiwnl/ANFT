@@ -1,7 +1,7 @@
 package me.xflyiwnl.anft.renderer;
 
 import me.xflyiwnl.anft.ANFT;
-import me.xflyiwnl.anft.object.ImageNFT;
+import me.xflyiwnl.anft.object.nft.ImageNFT;
 import me.xflyiwnl.anft.object.PlayerNFT;
 import org.bukkit.entity.Player;
 import org.bukkit.map.MapCanvas;
@@ -9,13 +9,6 @@ import org.bukkit.map.MapPalette;
 import org.bukkit.map.MapRenderer;
 import org.bukkit.map.MapView;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import javax.imageio.ImageIO;
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.net.URL;
 
 public class NFTRenderer extends MapRenderer {
 

@@ -1,4 +1,4 @@
-package me.xflyiwnl.anft.object;
+package me.xflyiwnl.anft.object.nft;
 
 import org.bukkit.Location;
 import org.bukkit.block.BlockFace;

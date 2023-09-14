@@ -1,28 +1,28 @@
 package me.xflyiwnl.anft.object;
 
-import io.papermc.paper.text.PaperComponents;
 import me.xflyiwnl.anft.ANFT;
+import me.xflyiwnl.anft.object.nft.Figure;
+import me.xflyiwnl.anft.object.nft.ImageNFT;
+import me.xflyiwnl.anft.object.nft.Point;
 import me.xflyiwnl.anft.renderer.NFTRenderer;
 import me.xflyiwnl.anft.util.ImageUtil;
 import org.bukkit.*;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.MapMeta;
 import org.bukkit.map.MapView;
-import org.bukkit.map.MinecraftFont;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 
-import java.awt.print.Paper;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
-public class NFT extends NFTObject {
+public class NFT extends NFTObject implements Saveable {
 
     private ImageNFT image;
     private List<Figure> figures = new ArrayList<Figure>();
 
     private Point point;
+    private boolean isPlaced = false;
 
     public NFT() {
     }
@@ -38,6 +38,21 @@ public class NFT extends NFTObject {
         this.image = image;
         this.figures = figures;
         image.setImage(ImageUtil.resizeImage(image.getImage(), getW(), getH()));
+    }
+
+    @Override
+    public void create(boolean save) {
+        ANFT.getInstance().getNfts().add(this);
+    }
+
+    @Override
+    public void save() {
+
+    }
+
+    @Override
+    public void remove() {
+
     }
 
     public Figure getFigure(int fw, int fh) {
@@ -91,5 +106,13 @@ public class NFT extends NFTObject {
 
     public void setPoint(Point point) {
         this.point = point;
+    }
+
+    public boolean isPlaced() {
+        return isPlaced;
+    }
+
+    public void setPlaced(boolean placed) {
+        isPlaced = placed;
     }
 }

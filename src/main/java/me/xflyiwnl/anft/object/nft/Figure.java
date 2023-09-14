@@ -1,4 +1,7 @@
-package me.xflyiwnl.anft.object;
+package me.xflyiwnl.anft.object.nft;
+
+import me.xflyiwnl.anft.object.NFTObject;
+import me.xflyiwnl.anft.object.Scaleable;
 
 import java.util.UUID;
 

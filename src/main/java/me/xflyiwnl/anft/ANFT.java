@@ -1,12 +1,14 @@
 package me.xflyiwnl.anft;
 
 import me.xflyiwnl.anft.command.NFTCommand;
+import me.xflyiwnl.anft.database.FlatFileSource;
 import me.xflyiwnl.anft.listener.MapListener;
 import me.xflyiwnl.anft.listener.PlayerListener;
 import me.xflyiwnl.anft.object.NFT;
 import me.xflyiwnl.anft.object.PlayerNFT;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.ArrayList;
@@ -18,6 +20,7 @@ public final class ANFT extends JavaPlugin {
     private static ANFT instance;
 
     private FileManager fileManager = new FileManager();
+    private FlatFileSource flatFileSource = new FlatFileSource();
     private NamespacedKey key = new NamespacedKey(this, "anft");
 
     private List<NFT> nfts = new ArrayList<NFT>();
@@ -28,9 +31,17 @@ public final class ANFT extends JavaPlugin {
         instance = this;
 
         fileManager.generate();
+        flatFileSource.load();
 
         registerCommand();
         registerListener();
+
+        checkPlayers();
+    }
+
+    @Override
+    public void onDisable() {
+        flatFileSource.unload();
     }
 
     public void registerCommand() {
@@ -40,6 +51,16 @@ public final class ANFT extends JavaPlugin {
     public void registerListener () {
         Bukkit.getPluginManager().registerEvents(new MapListener(), this);
         Bukkit.getPluginManager().registerEvents(new PlayerListener(), this);
+    }
+
+    public void checkPlayers() {
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            PlayerNFT playerNFT = ANFT.getInstance().getPlayer(player.getUniqueId());
+            if (playerNFT == null) {
+                playerNFT = new PlayerNFT(player.getUniqueId());
+                playerNFT.create();
+            }
+        }
     }
 
     public NFT getNFT(UUID uniqueId) {
@@ -74,6 +95,10 @@ public final class ANFT extends JavaPlugin {
 
     public List<NFT> getNfts() {
         return nfts;
+    }
+
+    public FlatFileSource getFlatFileSource() {
+        return flatFileSource;
     }
 
     public static ANFT getInstance() {

@@ -4,5 +4,7 @@ main: me.xflyiwnl.anft.ANFT
 api-version: '1.16'
 
 commands:
+  verify:
+  nft:
   anft:
-    description: "cmd"
+  nftgroup:

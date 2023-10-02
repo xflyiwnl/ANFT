@@ -1,0 +1,54 @@
+gui:
+  title: "Выбор размера"
+  rows: 3
+  mask:
+    - "BBBBBBBBB"
+    - "BOOOOOOOB"
+    - "BBPBCBNBB"
+
+size-item:
+  material: item_frame
+  display-name: "#008669%size%"
+  lore:
+    - " "
+    - " &fВысота: #008669%width%"
+    - " &fШирина: #008669%height%"
+    - " "
+    - " #008669Клик &7- &fсоздать NFT"
+    - " "
+
+items:
+  border-item:
+    material: black_stained_glass_pane
+    amount: 1
+    display-name: " "
+    lore:
+      - " "
+    mask: "B"
+  next-item:
+    material: lime_stained_glass_pane
+    amount: 1
+    display-name: "#008669Следующая страница"
+    lore:
+      - " "
+    mask: "N"
+    action:
+      - "[next]"
+  prev-item:
+    material: red_stained_glass_pane
+    amount: 1
+    display-name: "#008669Предыдущая страница"
+    lore:
+      - " "
+    mask: "P"
+    action:
+      - "[previous]"
+  custom-item:
+    material: chest
+    amount: 1
+    display-name: "#008669Свой размер"
+    lore:
+      - " "
+    mask: "C"
+    action:
+      - "[custom]"

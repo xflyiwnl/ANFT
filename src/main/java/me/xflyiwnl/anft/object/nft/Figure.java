@@ -18,12 +18,12 @@ public class Figure extends NFTObject implements Scaleable {
         this.oh = oh;
     }
 
-    public Figure(UUID uniqueId, int w, int h) {
-        super(uniqueId, w, h);
+    public Figure(String id, int w, int h) {
+        super(id, w, h);
     }
 
-    public Figure(UUID uniqueId, int w, int h, int ow, int oh) {
-        super(uniqueId, w, h);
+    public Figure(String id, int w, int h, int ow, int oh) {
+        super(id, w, h);
         this.ow = ow;
         this.oh = oh;
     }

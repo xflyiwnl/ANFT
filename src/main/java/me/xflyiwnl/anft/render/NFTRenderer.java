@@ -1,4 +1,4 @@
-package me.xflyiwnl.anft.renderer;
+package me.xflyiwnl.anft.render;
 
 import me.xflyiwnl.anft.ANFT;
 import me.xflyiwnl.anft.object.nft.ImageNFT;

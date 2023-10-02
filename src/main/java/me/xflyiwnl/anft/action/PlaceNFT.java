@@ -1,6 +1,7 @@
 package me.xflyiwnl.anft.action;
 
 import me.xflyiwnl.anft.ANFT;
+import me.xflyiwnl.anft.chat.MessageSender;
 import me.xflyiwnl.anft.object.NFT;
 import me.xflyiwnl.anft.object.orient.Orient;
 import me.xflyiwnl.anft.object.orient.OrientSide;
@@ -53,7 +54,7 @@ public class PlaceNFT implements Action {
             return null;
         }
 
-        UUID uniqueId = UUID.fromString(container.get(ANFT.getInstance().getKey(), PersistentDataType.STRING));
+        String uniqueId = container.get(ANFT.getInstance().getKey(), PersistentDataType.STRING);
         nft = ANFT.getInstance().getNFT(uniqueId);
         if (nft == null) {
             return null;
@@ -149,7 +150,9 @@ public class PlaceNFT implements Action {
         }
 
         if (nft.isPlaced()) {
-            player.sendMessage("Этот нфт уже поставлен");
+            new MessageSender(player)
+                    .path("nft-already-placed")
+                    .run();
             return true;
         }
 
@@ -160,7 +163,9 @@ public class PlaceNFT implements Action {
         Orient orient = orient(nft, location, side);
 
         if (!NFTUtil.checkFrames(entity.getLocation(), nft, frame.getFacing(), orient)) {
-            player.sendMessage("Недостаточно рамок");
+            new MessageSender(player)
+                    .path("not-enough-frames")
+                    .run();
             return true;
         }
 
@@ -169,7 +174,11 @@ public class PlaceNFT implements Action {
         nft.setPlaced(true);
         nft.save();
 
-        player.sendMessage("place");
+        player.getInventory().remove(mapItem());
+
+        new MessageSender(player)
+                .path("nft-placed")
+                .run();
 
         return true;
     }

@@ -1,0 +1,20 @@
+errors:
+
+  success:
+    id: 0
+    description: "Всё чётко"
+  unknown-address:
+    id: 1
+    description: "Неверная подпись"
+  verify-failed:
+    id: 2
+    description: "Ошибка верификации подписи"
+  data-address:
+    id: 3
+    description: "Не удается взять адрес с базы данных"
+  address-error:
+    id: 4
+    description: "Внутренняя ошибка"
+  server-error:
+    id: 5
+    description: "Неверный адрес"

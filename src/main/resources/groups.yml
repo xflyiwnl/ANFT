@@ -1,0 +1,13 @@
+groups:
+  default:
+    name: "Обычный"
+    limit: 2
+    default: true
+  premium:
+    name: "Премиум"
+    limit: 3
+    default: false
+  admin:
+    name: "Админ"
+    limit: -1
+    default: false

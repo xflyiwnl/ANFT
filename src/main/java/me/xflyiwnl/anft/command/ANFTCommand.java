@@ -3,33 +3,27 @@ package me.xflyiwnl.anft.command;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import me.xflyiwnl.anft.ANFT;
 import me.xflyiwnl.anft.chat.MessageSender;
 import me.xflyiwnl.anft.gui.NFTGUI;
 import me.xflyiwnl.anft.object.BufferedNFT;
 import me.xflyiwnl.anft.object.Error;
-import me.xflyiwnl.anft.object.PlayerNFT;
-import me.xflyiwnl.anft.object.nft.Figure;
-import me.xflyiwnl.anft.object.nft.ImageNFT;
 import me.xflyiwnl.anft.object.NFT;
+import me.xflyiwnl.anft.object.PlayerNFT;
 import me.xflyiwnl.anft.request.GetRequest;
+import me.xflyiwnl.anft.request.PostRequest;
 import me.xflyiwnl.anft.util.NFTUtil;
-import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.command.TabCompleter;
-import org.bukkit.entity.Horse;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.net.http.HttpResponse;
 import java.util.ArrayList;
 import java.util.List;
 
-public class NFTCommand implements CommandExecutor {
+public class ANFTCommand implements CommandExecutor {
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
@@ -40,7 +34,7 @@ public class NFTCommand implements CommandExecutor {
 
         Player player = (Player) sender;
 
-        if (!sender.hasPermission("nft.nft")) {
+        if (!sender.hasPermission("nft.anft")) {
             new MessageSender(player)
                     .path("no-permission")
                     .run();
@@ -74,7 +68,7 @@ public class NFTCommand implements CommandExecutor {
                 .path("nft-loading")
                 .run();
 
-        HttpResponse<String> response = new GetRequest()
+        HttpResponse<String> response = new PostRequest()
                 .url(ANFT.getInstance().getWebserver() + "/nft/" + args[0])
                 .send();
         JsonObject json = new Gson().fromJson(response.body(), JsonObject.class);

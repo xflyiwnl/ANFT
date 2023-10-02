@@ -1,18 +1,20 @@
 package me.xflyiwnl.anft.util;
 
 import me.xflyiwnl.anft.ANFT;
+import me.xflyiwnl.anft.chat.MessageSender;
 import me.xflyiwnl.anft.object.*;
 import me.xflyiwnl.anft.object.nft.Figure;
 import me.xflyiwnl.anft.object.nft.ImageNFT;
 import me.xflyiwnl.anft.object.orient.Orient;
 import me.xflyiwnl.anft.object.orient.OrientSide;
-import me.xflyiwnl.anft.renderer.NFTRenderer;
+import me.xflyiwnl.anft.render.NFTRenderer;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.ItemFrame;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.MapMeta;
 import org.bukkit.map.MapView;
@@ -20,6 +22,68 @@ import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 
 public class NFTUtil {
+
+    public static void giveNFT(Player player, BufferedNFT bufferedNFT, Size size) {
+
+        PlayerNFT playerNFT = ANFT.getInstance().getPlayer(player.getUniqueId());
+        ImageNFT imageNFT = new ImageNFT(bufferedNFT.getUrl());
+
+        new MessageSender(player)
+                .path("nft-loading")
+                .run();
+
+        String formattedId = generateId(bufferedNFT.getAddress(), bufferedNFT.getTokenId());
+        NFT snft = ANFT.getInstance().getNFT(formattedId);
+        if (snft != null) {
+            player.getInventory().addItem(snft.asItemStack(player.getWorld()));
+
+            new MessageSender(player)
+                    .path("given-nft")
+                    .run();
+            return;
+        }
+
+        if (!imageNFT.load()) {
+            new MessageSender(player)
+                    .path("response-error")
+                    .replace("code", "?")
+                    .replace("description", "???")
+                    .run();
+            return;
+        }
+
+        NFT nft = new NFT(formattedId, size.getW() * 128, size.getH() * 128, bufferedNFT.getTokenId(), bufferedNFT.getName(), bufferedNFT.getDescription(), player.getUniqueId(), imageNFT);
+        nft.frames();
+        nft.create(true);
+
+        playerNFT.getNfts().add(nft);
+        playerNFT.save();
+
+        player.getInventory().addItem(nft.asItemStack(player.getWorld()));
+
+        new MessageSender(player)
+                .path("given-nft")
+                .run();
+
+    }
+
+    public static void giveNFT(Player player, NFT nft, Size size) {
+
+        new MessageSender(player)
+                .path("nft-loading")
+                .run();
+
+        player.getInventory().addItem(nft.asItemStack(player.getWorld()));
+
+        new MessageSender(player)
+                .path("given-nft")
+                .run();
+
+    }
+
+    public static String generateId(String address, int tokenId) {
+        return address + "-" + tokenId;
+    }
 
     public static boolean checkFrame(Location location, BlockFace face, double x, double y, double z) {
         Location resultLocation = new Location(location.getWorld(), x, y, z);
@@ -89,7 +153,7 @@ public class NFTUtil {
         MapMeta mapMeta = (MapMeta) itemStack.getItemMeta();
         mapMeta.setMapView(view);
         PersistentDataContainer container = mapMeta.getPersistentDataContainer();
-        container.set(ANFT.getInstance().getKey(), PersistentDataType.STRING, nft.getUniqueId().toString());
+        container.set(ANFT.getInstance().getKey(), PersistentDataType.STRING, nft.getId());
         itemStack.setItemMeta(mapMeta);
 
         frame.setItem(itemStack);
@@ -166,6 +230,11 @@ public class NFTUtil {
     }
 
     public static void breakNFT(ItemFrame frame, Location location, Orient orient) {
+
+        System.out.println("x: " + orient.getXa() + " / " + orient.getXb());
+        System.out.println("y: " + orient.getYa() + " / " + orient.getYb());
+        System.out.println("z: " + orient.getZa() + " / " + orient.getZb());
+
         double x, y, z;
         switch (orient.getSide()) {
             case Z_SIDE_INVERTED:

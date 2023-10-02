@@ -2,16 +2,16 @@ package me.xflyiwnl.anft.object;
 
 import java.util.UUID;
 
-public abstract class NFTObject implements Identifyable, Scaleable {
+public abstract class NFTObject implements Scaleable {
 
-    private UUID uniqueId = UUID.randomUUID();
+    private String id = UUID.randomUUID().toString();
     private int w, h;
 
     public NFTObject() {
     }
 
-    public NFTObject(UUID uniqueId) {
-        this.uniqueId = uniqueId;
+    public NFTObject(String id) {
+        this.id = id;
     }
 
     public NFTObject(int w, int h) {
@@ -19,19 +19,18 @@ public abstract class NFTObject implements Identifyable, Scaleable {
         this.h = h;
     }
 
-    public NFTObject(UUID uniqueId, int w, int h) {
-        this.uniqueId = uniqueId;
+    public NFTObject(String id, int w, int h) {
+        this.id = id;
         this.w = w;
         this.h = h;
     }
 
-    @Override
-    public UUID getUniqueId() {
-        return uniqueId;
+    public String getId() {
+        return id;
     }
 
-    public void setUniqueId(UUID uniqueId) {
-        this.uniqueId = uniqueId;
+    public void setId(String id) {
+        this.id = id;
     }
 
     @Override

@@ -1,10 +1,12 @@
 package me.xflyiwnl.anft.action;
 
 import me.xflyiwnl.anft.ANFT;
+import me.xflyiwnl.anft.chat.MessageSender;
 import me.xflyiwnl.anft.object.NFT;
 import me.xflyiwnl.anft.object.orient.Orient;
 import me.xflyiwnl.anft.object.orient.OrientSide;
 import me.xflyiwnl.anft.object.nft.Point;
+import me.xflyiwnl.anft.object.serialize.NFTSerialize;
 import me.xflyiwnl.anft.util.NFTUtil;
 import org.bukkit.Location;
 import org.bukkit.entity.ItemFrame;
@@ -14,6 +16,7 @@ import org.bukkit.inventory.meta.MapMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 
+import java.util.Map;
 import java.util.UUID;
 
 public class BreakNFT implements Action {
@@ -35,7 +38,7 @@ public class BreakNFT implements Action {
         if (!container.has(ANFT.getInstance().getKey(), PersistentDataType.STRING)) {
             return null;
         }
-        UUID uniqueId = UUID.fromString(container.get(ANFT.getInstance().getKey(), PersistentDataType.STRING));
+        String uniqueId = container.get(ANFT.getInstance().getKey(), PersistentDataType.STRING);
         NFT nft = ANFT.getInstance().getNFT(uniqueId);
         if (nft == null) {
             return null;
@@ -141,6 +144,12 @@ public class BreakNFT implements Action {
         NFTUtil.breakNFT(frame, location, orient);
         nft.setPlaced(false);
         nft.save();
+
+        player.getInventory().addItem(nft.asItemStack(player.getWorld()));
+
+        new MessageSender(player)
+                .path("break-nft")
+                .run();
 
         return true;
     }

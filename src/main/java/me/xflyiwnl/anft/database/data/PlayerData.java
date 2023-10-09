@@ -61,6 +61,9 @@ public class PlayerData implements Data<PlayerNFT> {
         List<PlayerNFT> players = new ArrayList<PlayerNFT>();
 
         File folder = ANFT.getInstance().getFileManager().getPlayersFolder();
+
+        if (folder == null) return players;
+
         for (File file : folder.listFiles()) {
             PlayerNFT player = get(file);
             if (player == null) continue;

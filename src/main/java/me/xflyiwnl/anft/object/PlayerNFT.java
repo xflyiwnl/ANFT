@@ -14,6 +14,7 @@ public class PlayerNFT implements Identifyable {
     private Group group;
     private List<NFT> nfts = new ArrayList<NFT>();
     private List<Integer> rendered = new ArrayList<Integer>();
+    private long cooldown = System.currentTimeMillis();
 
     private Ask ask;
 
@@ -43,6 +44,15 @@ public class PlayerNFT implements Identifyable {
     public void remove() {
         ANFT.getInstance().getFlatFileSource().getPlayerData().remove(this);
         ANFT.getInstance().getPlayers().remove(this);
+    }
+
+    public NFT getNFT(String id) {
+        for (NFT nft : nfts) {
+            if (nft.getId().equalsIgnoreCase(id)) {
+                return nft;
+            }
+        }
+        return null;
     }
 
     public boolean hasAsk() {
@@ -98,5 +108,13 @@ public class PlayerNFT implements Identifyable {
 
     public void setNfts(List<NFT> nfts) {
         this.nfts = nfts;
+    }
+
+    public long getCooldown() {
+        return cooldown;
+    }
+
+    public void setCooldown(long cooldown) {
+        this.cooldown = cooldown;
     }
 }

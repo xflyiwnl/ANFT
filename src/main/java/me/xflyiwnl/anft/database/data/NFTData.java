@@ -11,6 +11,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -27,7 +28,6 @@ public class NFTData implements Data<NFT> {
     public void load() {
         List<NFT> nfts = all();
         for (NFT nft : nfts) {
-            nft.getImage().load();
             nft.create(false);
             nft.locate();
         }
@@ -75,6 +75,7 @@ public class NFTData implements Data<NFT> {
         if (!imageFile.exists()) {
             return null;
         }
+
         BufferedImage bufferedImage = null;
         try {
             bufferedImage = ImageIO.read(imageFile);
@@ -82,25 +83,24 @@ public class NFTData implements Data<NFT> {
             throw new RuntimeException(e);
         }
         nft.getImage().setImage(ImageUtil.resizeImage(bufferedImage, nft.getW(), nft.getH()));
+        nft.getImage().setImageLoaded(true);
 
         if (map.containsKey("figures")) {
-//            List<String> formatted = (List<String>) map.get("figures");
-//            if (!formatted.isEmpty()) {
-//                for (String value : formatted) {
-//                    String[] split = value.split(",");
-//                    nft.getFigures().add(new Figure(
-//                            split[0],
-//                            Integer.valueOf(split[1]),
-//                            Integer.valueOf(split[2]),
-//                            Integer.valueOf(split[3]),
-//                            Integer.valueOf(split[4])
-//                    ));
-//                }
-//            }
-            nft.frames();
-            nft.getFigures().forEach(figure -> {
-                System.out.println(figure.getId() + " / " + figure.getH() + " / " + figure.getW() + " / " + figure.getOw() + " / " + figure.getOh());
-            });
+            List<String> formatted = (List<String>) map.get("figures");
+            if (!formatted.isEmpty()) {
+                for (String value : formatted) {
+                    String[] split = value.split(",");
+                    nft.getFigures().add(new Figure(
+                            nft,
+                            Integer.valueOf(split[5]),
+                            split[0],
+                            Integer.valueOf(split[1]),
+                            Integer.valueOf(split[2]),
+                            Integer.valueOf(split[3]),
+                            Integer.valueOf(split[4])
+                    ));
+                }
+            }
         }
 
         return nft;
@@ -146,6 +146,8 @@ public class NFTData implements Data<NFT> {
     public void remove(NFT nft) {
         File file = new File(ANFT.getInstance().getFileManager().getNftsFolder().getPath(), File.separator + nft.getId() + ".yml");
         file.delete();
+        File image = new File(ANFT.getInstance().getFileManager().getImageFolder().getPath(), File.separator + nft.getId() + ".png");
+        image.delete();
     }
 
     @Override
@@ -153,6 +155,7 @@ public class NFTData implements Data<NFT> {
         List<NFT> nfts = new ArrayList<NFT>();
 
         File folder = ANFT.getInstance().getFileManager().getNftsFolder();
+        if (folder == null) return nfts;
         for (File file : folder.listFiles()) {
             if (file.isDirectory()) continue;
             NFT nft = get(file);

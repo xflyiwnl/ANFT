@@ -1,5 +1,8 @@
 package me.xflyiwnl.anft.object.nft;
 
+import me.xflyiwnl.anft.ANFT;
+import org.bukkit.scheduler.BukkitRunnable;
+
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -9,6 +12,7 @@ public class ImageNFT {
 
     private BufferedImage image;
     private String url;
+    private boolean imageLoaded = false;
 
     public ImageNFT() {
     }
@@ -25,10 +29,10 @@ public class ImageNFT {
     public boolean load() {
         try {
             image = ImageIO.read(new URL(url));
+            return true;
         } catch (IOException e) {
             return false;
         }
-        return true;
     }
 
     public ImageNFT crop(int ow, int oh) {
@@ -46,6 +50,14 @@ public class ImageNFT {
 
     public void setImage(BufferedImage image) {
         this.image = image;
+    }
+
+    public boolean isImageLoaded() {
+        return imageLoaded;
+    }
+
+    public void setImageLoaded(boolean imageLoaded) {
+        this.imageLoaded = imageLoaded;
     }
 
     public String getUrl() {

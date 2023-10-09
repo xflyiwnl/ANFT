@@ -1,3 +1,20 @@
 settings:
 
   web-server: "http://80.87.106.191:3000"
+
+  deny-messages:
+    - "отмена"
+    - "deny"
+
+  nft-item:
+    display-name: "#008669%name%"
+    lore:
+      - " "
+      - " &fТокен: #008669%token%"
+      - " "
+      - " &fВысота: #008669%height%"
+      - " &fВысота: #008669%width%"
+      - " "
+
+  cooldown: 10
+  nft-hash-update-time: 30

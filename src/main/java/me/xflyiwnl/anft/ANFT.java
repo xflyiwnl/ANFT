@@ -1,20 +1,20 @@
 package me.xflyiwnl.anft;
 
-import me.xflyiwnl.anft.command.ANFTCommand;
-import me.xflyiwnl.anft.command.GroupCommand;
-import me.xflyiwnl.anft.command.NFTCommand;
-import me.xflyiwnl.anft.command.VerifyCommand;
-import me.xflyiwnl.anft.config.YAML;
+import me.xflyiwnl.anft.command.*;
 import me.xflyiwnl.anft.database.FlatFileSource;
+import me.xflyiwnl.anft.listener.ChunkListener;
 import me.xflyiwnl.anft.listener.MapListener;
 import me.xflyiwnl.anft.listener.PlayerListener;
 import me.xflyiwnl.anft.object.*;
 import me.xflyiwnl.anft.object.Error;
+import me.xflyiwnl.anft.object.nft.Figure;
 import me.xflyiwnl.colorfulgui.ColorfulGUI;
 import org.bukkit.Bukkit;
+import org.bukkit.Chunk;
 import org.bukkit.NamespacedKey;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.ArrayList;
@@ -35,6 +35,8 @@ public final class ANFT extends JavaPlugin {
     private List<PlayerNFT> players = new ArrayList<PlayerNFT>();
     private List<Size> sizes = new ArrayList<Size>();
     private List<Error> errors = new ArrayList<Error>();
+    private List<HashedNFT> hashedNFTS = new ArrayList<HashedNFT>();
+    private List<Chunk> chunks = new ArrayList<Chunk>();
 
     private int limitW = 10, limitH = 10;
     private String webserver;
@@ -57,13 +59,16 @@ public final class ANFT extends JavaPlugin {
         registerCommand();
         registerListener();
 
-        checkPlayers();
     }
 
     @Override
     public void onDisable() {
         flatFileSource.unload();
     }
+
+    /*
+    *   Регистрация команд
+    */
 
     public void registerCommand() {
         getCommand("nft").setExecutor(new NFTCommand());
@@ -74,12 +79,25 @@ public final class ANFT extends JavaPlugin {
 
         getCommand("nftgroup").setExecutor(new GroupCommand());
         getCommand("nftgroup").setTabCompleter(new GroupCommand());
+
+        getCommand("nftclean").setExecutor(new CleanCommand());
+        getCommand("nftclean").setTabCompleter(new CleanCommand());
     }
 
+    /*
+     *  Регистрация слушателей
+     */
+
     public void registerListener () {
-        Bukkit.getPluginManager().registerEvents(new MapListener(), this);
-        Bukkit.getPluginManager().registerEvents(new PlayerListener(), this);
+        PluginManager pm = Bukkit.getPluginManager();
+        pm.registerEvents(new MapListener(), this);
+        pm.registerEvents(new PlayerListener(), this);
+        pm.registerEvents(new ChunkListener(), this);
     }
+
+    /*
+     *  Регистрация ошибок (ответы от сервера)
+     */
 
     public void loadErrors() {
         FileConfiguration yaml = fileManager.getErrors().yaml();
@@ -99,9 +117,17 @@ public final class ANFT extends JavaPlugin {
         }
     }
 
+    /*
+     *  Загрузка эндпоинта (вебсервер и порт)
+     */
+
     public void loadServer() {
         webserver = fileManager.getSettings().yaml().getString("settings.web-server");
     }
+
+    /*
+     *  Получение ошибки из памяти (Циклом проходим по всем существующим ошибкам и сравниваем айдишники)
+     */
 
     public Error getError(int code) {
         for (Error error : errors) {
@@ -112,6 +138,10 @@ public final class ANFT extends JavaPlugin {
         return new Error(code);
     }
 
+    /*
+     *  Загрузка размеров изображений
+     */
+
     public void loadSizes() {
         FileConfiguration yaml = fileManager.getSize().yaml();
         for (String formattedSize : yaml.getStringList("size.default-sizes")) {
@@ -121,6 +151,10 @@ public final class ANFT extends JavaPlugin {
         limitW = yaml.getInt("size.limit.w");
         limitH = yaml.getInt("size.limit.h");
     }
+
+    /*
+     *  Загрузка групп (Премиум, дефолт)
+     */
 
     public void loadGroups() {
         FileConfiguration yaml = fileManager.getGroups().yaml();
@@ -145,6 +179,10 @@ public final class ANFT extends JavaPlugin {
         }
     }
 
+    /*
+     *  Проверяем всех игроков после перезагрузки на наличие их в памяти и сохранены ли они вообще
+     */
+
     public void checkPlayers() {
         for (Player player : Bukkit.getOnlinePlayers()) {
             PlayerNFT playerNFT = ANFT.getInstance().getPlayer(player.getUniqueId());
@@ -155,6 +193,10 @@ public final class ANFT extends JavaPlugin {
         }
     }
 
+    /*
+     *  Получение НФТ из памяти, проходим циклом по всем НФТ и сравниваем айди
+     */
+
     public NFT getNFT(String id) {
         for (NFT nft : nfts) {
             if (nft.getId().equals(id)) {
@@ -163,6 +205,28 @@ public final class ANFT extends JavaPlugin {
         }
         return null;
     }
+
+    /*
+     *  Получаем часть изображения НФТ
+     */
+
+    public Figure getFigure(int mapId) {
+        for (NFT nft : nfts) {
+            if (!nft.isPlaced()) {
+                continue;
+            }
+            for (Figure figure : nft.getFigures()) {
+                if (figure.getMapId() == mapId) {
+                    return figure;
+                }
+            }
+        }
+        return null;
+    }
+
+    /*
+     *  Получаем игрока из памяти (они хранят их статус верификации, их нфтшки и кулдауны)
+     */
 
     public PlayerNFT getPlayer(UUID uniqueId) {
         for (PlayerNFT player : players) {
@@ -173,6 +237,10 @@ public final class ANFT extends JavaPlugin {
         return null;
     }
 
+    /*
+     *  Получаем группу из памяти (Премиум, дефолт и другие)
+     */
+
     public Group getGroup(String name) {
         for (Group group : groups) {
             if (group.getName().equalsIgnoreCase(name)) {
@@ -180,6 +248,34 @@ public final class ANFT extends JavaPlugin {
             }
         }
         return defaultGroup;
+    }
+
+    /*
+     *  Получаем хэшированный список НФТ после запроса
+     *  Он хранит нфт игрока
+     */
+
+    public HashedNFT getHashedNFT(UUID uniqueId) {
+        for (HashedNFT hashedNFT : hashedNFTS) {
+            if (hashedNFT.getUniqueId() != null && hashedNFT.getUniqueId().equals(uniqueId)) {
+                return hashedNFT;
+            }
+        }
+        return null;
+    }
+
+    /*
+     *  Получаем хэшированный список НФТ после запроса
+     *  Он хранит нфт адреса
+     */
+
+    public HashedNFT getHashedNFT(String address) {
+        for (HashedNFT hashedNFT : hashedNFTS) {
+            if (hashedNFT.getAddress() != null && hashedNFT.getAddress().equalsIgnoreCase(address)) {
+                return hashedNFT;
+            }
+        }
+        return null;
     }
 
     public FileManager getFileManager() {
@@ -238,4 +334,11 @@ public final class ANFT extends JavaPlugin {
         return defaultGroup;
     }
 
+    public List<HashedNFT> getHashedNFTS() {
+        return hashedNFTS;
+    }
+
+    public List<Chunk> getChunks() {
+        return chunks;
+    }
 }

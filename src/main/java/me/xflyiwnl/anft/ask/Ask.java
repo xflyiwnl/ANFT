@@ -38,7 +38,7 @@ public class Ask {
     }
 
     public void onChat(AskMessage ask) {
-        if (ask.getMessage().getValue().equalsIgnoreCase("отмена")) {
+        if (ANFT.getInstance().getFileManager().getSettings().yaml().getStringList("settings.deny-messages").contains(ask.getMessage().getValue())) {
             cancel();
             return;
         }

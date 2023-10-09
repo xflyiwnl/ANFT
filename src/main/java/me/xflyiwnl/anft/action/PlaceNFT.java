@@ -3,11 +3,13 @@ package me.xflyiwnl.anft.action;
 import me.xflyiwnl.anft.ANFT;
 import me.xflyiwnl.anft.chat.MessageSender;
 import me.xflyiwnl.anft.object.NFT;
+import me.xflyiwnl.anft.object.PlayerNFT;
 import me.xflyiwnl.anft.object.orient.Orient;
 import me.xflyiwnl.anft.object.orient.OrientSide;
 import me.xflyiwnl.anft.object.nft.Point;
 import me.xflyiwnl.anft.util.NFTUtil;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
@@ -37,6 +39,10 @@ public class PlaceNFT implements Action {
 
         ItemStack mapItem = mapItem();
         if (mapItem == null) {
+            return null;
+        }
+
+        if (mapItem.getType() != Material.FILLED_MAP) {
             return null;
         }
 
@@ -140,6 +146,36 @@ public class PlaceNFT implements Action {
         }
     }
 
+    public String formattedTime(double time) {
+
+        String formatted = "";
+
+        if (time == 0) {
+            formatted = "сейчас";
+        } else {
+            int all = (int) time;
+
+            int day = all / 86400;
+            int hour = all / 3600 % 24;
+            int minut = all / 60 % 60;
+            int second = all % 60;
+
+            if (day != 0)
+                formatted = formatted + day + "д ";
+
+            if (hour != 0)
+                formatted = formatted + hour + "ч ";
+
+            if (minut != 0)
+                formatted = formatted + minut + "м ";
+
+            if (second != 0)
+                formatted = formatted + second + "с ";
+        }
+
+        return formatted;
+    }
+
     @Override
     public boolean execute() {
 
@@ -152,6 +188,17 @@ public class PlaceNFT implements Action {
         if (nft.isPlaced()) {
             new MessageSender(player)
                     .path("nft-already-placed")
+                    .run();
+            return true;
+        }
+
+        PlayerNFT playerNFT = ANFT.getInstance().getPlayer(player.getUniqueId());
+        double time = (System.currentTimeMillis() - playerNFT.getCooldown()) / 1000;
+        double cooldown = ANFT.getInstance().getFileManager().getSettings().yaml().getDouble("settings.cooldown");
+        if (time < cooldown) {
+            new MessageSender(player)
+                    .path("nft-place-cooldown")
+                    .replace("time", formattedTime(cooldown - time))
                     .run();
             return true;
         }
@@ -175,6 +222,7 @@ public class PlaceNFT implements Action {
         nft.save();
 
         player.getInventory().remove(mapItem());
+        playerNFT.setCooldown(System.currentTimeMillis());
 
         new MessageSender(player)
                 .path("nft-placed")

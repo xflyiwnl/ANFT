@@ -4,6 +4,9 @@ import me.xflyiwnl.anft.ANFT;
 import me.xflyiwnl.anft.FileManager;
 import me.xflyiwnl.anft.database.data.NFTData;
 import me.xflyiwnl.anft.database.data.PlayerData;
+import me.xflyiwnl.anft.object.NFT;
+import me.xflyiwnl.anft.object.PlayerNFT;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.File;
 
@@ -20,11 +23,22 @@ public class FlatFileSource implements DataSource {
         playerData.load();
         nftData.load();
 
+        ANFT.getInstance().getNfts().forEach(nft -> {
+            PlayerNFT playerNFT = ANFT.getInstance().getPlayer(nft.getOwner());
+            if (playerNFT == null) {
+                return;
+            }
+            playerNFT.getNfts().add(nft);
+        });
+
+        ANFT.getInstance().checkPlayers();
+
     }
 
     @Override
     public void unload() {
-
+        ANFT.getInstance().getNfts().forEach(NFT::save);
+        ANFT.getInstance().getPlayers().forEach(PlayerNFT::save);
     }
 
     public FileManager getManager() {

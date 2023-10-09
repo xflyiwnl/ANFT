@@ -7,7 +7,7 @@ import java.util.HashMap;
 
 public class MessageSender {
 
-    private final Player player;
+    private Player player;
     private String path;
     private Message message;
 
@@ -17,8 +17,16 @@ public class MessageSender {
         this.player = player;
     }
 
+    public MessageSender() {
+    }
+
     public MessageSender path(String path) {
         this.path = path;
+        return this;
+    }
+
+    public MessageSender player(Player player) {
+        this.player = player;
         return this;
     }
 

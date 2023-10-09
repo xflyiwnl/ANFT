@@ -9,6 +9,7 @@ import me.xflyiwnl.anft.object.nft.Point;
 import me.xflyiwnl.anft.object.serialize.NFTSerialize;
 import me.xflyiwnl.anft.util.NFTUtil;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -29,7 +30,14 @@ public class BreakNFT implements Action {
         this.frame = frame;
     }
 
+    /*
+     *  Получаем нфт из айтемстака
+     */
+
     public NFT getNFTfromMap(ItemStack itemStack) {
+        if (itemStack.getType() != Material.FILLED_MAP) {
+            return null;
+        }
         MapMeta itemMeta = (MapMeta) itemStack.getItemMeta();
         if (itemMeta == null) {
             return null;
@@ -45,6 +53,11 @@ public class BreakNFT implements Action {
         }
         return nft;
     }
+
+    /*
+     *  Получаем ориентацию и устанавливаем размеры рамок
+     *  откуда и до какой точки
+     */
 
     public Orient orient(NFT nft, Location location, OrientSide side) {
         Orient orient = new Orient();
@@ -105,6 +118,10 @@ public class BreakNFT implements Action {
         return orient;
     }
 
+    /*
+     *  Получаем сторону ориентации
+     */
+
     public OrientSide side(ItemFrame frame) {
         switch (frame.getFacing()) {
             case SOUTH:
@@ -124,6 +141,11 @@ public class BreakNFT implements Action {
         }
     }
 
+    /*
+     *  Тут происходит весь движ
+     *  проверка всего и ломание нфт
+     */
+
     @Override
     public boolean execute() {
 
@@ -132,6 +154,17 @@ public class BreakNFT implements Action {
         NFT nft = getNFTfromMap(itemStack);
         if (nft == null) {
             return false;
+        }
+
+        if (!nft.isPlaced()) {
+            return false;
+        }
+
+        if (!player.isOp() && !player.getUniqueId().equals(nft.getOwner())) {
+            new MessageSender(player)
+                    .path("break-other-nft")
+                    .run();
+            return true;
         }
 
         Point point = nft.getPoint();
@@ -143,9 +176,12 @@ public class BreakNFT implements Action {
         Orient orient = orient(nft, location, side(frame));
         NFTUtil.breakNFT(frame, location, orient);
         nft.setPlaced(false);
+        nft.resetFigures();
         nft.save();
 
-        player.getInventory().addItem(nft.asItemStack(player.getWorld()));
+        if (player.getUniqueId().equals(nft.getOwner())) {
+            player.getInventory().addItem(nft.asItemStack(player.getWorld()));
+        }
 
         new MessageSender(player)
                 .path("break-nft")

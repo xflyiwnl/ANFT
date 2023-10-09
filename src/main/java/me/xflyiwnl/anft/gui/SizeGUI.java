@@ -39,6 +39,14 @@ public class SizeGUI extends ColorfulProvider<PaginatedGui> {
 
     @Override
     public void init() {
+
+        if (nft != null && nft.isPlaced()) {
+            new MessageSender(getPlayer())
+                    .path("nft-placed-error")
+                    .run();
+            return;
+        }
+
         items();
         nfts();
 
@@ -154,7 +162,12 @@ public class SizeGUI extends ColorfulProvider<PaginatedGui> {
                                                         }
                                                         Size size = new Size(w, h);
 
-                                                        NFTUtil.giveNFT(getPlayer(), bufferedNFT, size);
+                                                        if (bufferedNFT == null) {
+                                                            NFTUtil.giveNFT(getPlayer(), nft, size);
+                                                        } else {
+                                                            NFTUtil.giveNFT(getPlayer(), bufferedNFT, size);
+
+                                                        }
                                                     },
                                                     () -> {}
                                             )

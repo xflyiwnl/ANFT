@@ -2,6 +2,7 @@ package me.xflyiwnl.anft.gui;
 
 import me.xflyiwnl.anft.ANFT;
 import me.xflyiwnl.anft.object.BufferedNFT;
+import me.xflyiwnl.anft.object.HashedNFT;
 import me.xflyiwnl.anft.object.NFT;
 import me.xflyiwnl.anft.object.PlayerNFT;
 import me.xflyiwnl.colorfulgui.builder.inventory.DynamicGuiBuilder;

@@ -1,6 +1,7 @@
 package me.xflyiwnl.anft.command;
 
 import me.xflyiwnl.anft.ANFT;
+import me.xflyiwnl.anft.chat.MessageSender;
 import me.xflyiwnl.anft.object.Group;
 import me.xflyiwnl.anft.object.PlayerNFT;
 import me.xflyiwnl.anft.object.Translator;
@@ -23,6 +24,11 @@ public class GroupCommand implements CommandExecutor, TabCompleter {
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
+
+        if (!sender.hasPermission("nft.group")) {
+            sender.sendMessage(TextUtil.colorize(Translator.of("no-permission")));
+            return true;
+        }
 
         if (args.length < 2) {
             sender.sendMessage(TextUtil.colorize(Translator.of("not-enough-args")));

@@ -6,7 +6,9 @@ import me.xflyiwnl.anft.object.nft.ImageNFT;
 import me.xflyiwnl.anft.object.nft.Point;
 import me.xflyiwnl.anft.render.NFTRenderer;
 import me.xflyiwnl.anft.util.ImageUtil;
+import me.xflyiwnl.colorfulgui.util.TextUtil;
 import org.bukkit.*;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.MapMeta;
 import org.bukkit.map.MapView;
@@ -63,7 +65,16 @@ public class NFT extends NFTObject implements Saveable {
 
     }
 
+    public void resetFigures() {
+        for (Figure figure : figures) {
+            figure.setMapId(-1);
+        }
+    }
+
     public void frames() {
+        if (!this.getFigures().isEmpty()) {
+            getFigures().clear();
+        }
         int ew = getW() / 128, eh = getH() / 128;
         int w = 128 * ew, h = 128 * eh;
         for (int fw = 0; fw < w / 128; fw++) {
@@ -89,6 +100,13 @@ public class NFT extends NFTObject implements Saveable {
 
     @Override
     public void remove() {
+        for (PlayerNFT playerNFT : ANFT.getInstance().getPlayers()) {
+            if (playerNFT.getNfts().contains(this)) {
+                playerNFT.getNfts().remove(this);
+                playerNFT.save();
+            }
+        }
+        ANFT.getInstance().getNfts().remove(this);
         ANFT.getInstance().getFlatFileSource().getNftData().remove(this);
     }
 
@@ -117,6 +135,15 @@ public class NFT extends NFTObject implements Saveable {
         return null;
     }
 
+    public Figure getFigure(int mapId) {
+        for (Figure figure : figures) {
+            if (figure.getMapId() == mapId) {
+                return figure;
+            }
+        }
+        return null;
+    }
+
     public ItemStack asItemStack(World world) {
 
         NFTRenderer renderer = new NFTRenderer(image);
@@ -131,6 +158,22 @@ public class NFT extends NFTObject implements Saveable {
 
         PersistentDataContainer container = mapMeta.getPersistentDataContainer();
         container.set(ANFT.getInstance().getKey(), PersistentDataType.STRING, getId());
+
+        FileConfiguration yaml = ANFT.getInstance().getFileManager().getSettings().yaml();
+
+        mapMeta.setDisplayName(TextUtil.colorize(yaml.getString("settings.nft-item.display-name")
+                .replace("%name%", getName())
+                .replace("%token%", String.valueOf(getTokenId()))
+                .replace("%height%", String.valueOf(getH() / 128))
+                .replace("%width%", String.valueOf(getW() / 128))));
+        List<String> lore = new ArrayList<String>();
+        yaml.getStringList("settings.nft-item.lore").forEach(s -> {
+            lore.add(s.replace("%name%", getName())
+                    .replace("%token%", String.valueOf(getTokenId()))
+                    .replace("%height%", String.valueOf(getH() / 128))
+                    .replace("%width%", String.valueOf(getW() / 128)));
+        });
+        mapMeta.setLore(TextUtil.colorize(lore));
 
         itemStack.setItemMeta(mapMeta);
 

@@ -49,7 +49,7 @@ public class NFTSerialize implements Serialize<NFT> {
         List<String> formattedFig = new ArrayList<String>();
         for (Figure figure : figures) {
             formattedFig.add(
-                    figure.getId() + "," + figure.getW() + "," + figure.getH() + "," + figure.getOw() + "," + figure.getOh()
+                    figure.getId() + "," + figure.getW() + "," + figure.getH() + "," + figure.getOw() + "," + figure.getOh() + "," + figure.getMapId()
             );
         }
         map.put("figures", formattedFig);

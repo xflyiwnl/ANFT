@@ -20,8 +20,74 @@ import org.bukkit.inventory.meta.MapMeta;
 import org.bukkit.map.MapView;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
+import org.bukkit.scheduler.BukkitRunnable;
+
+import java.util.List;
 
 public class NFTUtil {
+
+    /*
+     *  Проверяем содержит ли рамка НФТ
+     */
+
+    public static boolean isNFT(ItemFrame frame) {
+        ItemStack itemStack = frame.getItem();
+
+        if (itemStack.getType() != Material.FILLED_MAP) {
+            return false;
+        }
+
+        MapMeta itemMeta = (MapMeta) itemStack.getItemMeta();
+        if (itemMeta == null) {
+            return false;
+        }
+        PersistentDataContainer container = itemMeta.getPersistentDataContainer();
+        if (!container.has(ANFT.getInstance().getKey(), PersistentDataType.STRING)) {
+            return false;
+        }
+        String uniqueId = container.get(ANFT.getInstance().getKey(), PersistentDataType.STRING);
+        NFT nft = ANFT.getInstance().getNFT(uniqueId);
+        if (nft == null) {
+            return false;
+        }
+        return true;
+    }
+
+    /*
+     *  Проверяем содержит ли массив нфт
+     */
+
+    public static boolean containsNFT(List<ItemFrame> frames) {
+        for (ItemFrame frame : frames) {
+            ItemStack itemStack = frame.getItem();
+
+            if (itemStack.getType() != Material.FILLED_MAP) {
+                continue;
+            }
+
+            MapMeta itemMeta = (MapMeta) itemStack.getItemMeta();
+            if (itemMeta == null) {
+                continue;
+            }
+            PersistentDataContainer container = itemMeta.getPersistentDataContainer();
+            if (!container.has(ANFT.getInstance().getKey(), PersistentDataType.STRING)) {
+                continue;
+            }
+            String uniqueId = container.get(ANFT.getInstance().getKey(), PersistentDataType.STRING);
+            NFT nft = ANFT.getInstance().getNFT(uniqueId);
+            if (nft == null) {
+                continue;
+            }
+            return true;
+        }
+        return false;
+    }
+
+    /*
+     *  Выдаём нфт как предмет
+     *  Если нфт уже загружен и существует, то выдаём существующий
+     *  Если нфт не существует, то создаём и загружаем картинку
+     */
 
     public static void giveNFT(Player player, BufferedNFT bufferedNFT, Size size) {
 
@@ -35,6 +101,16 @@ public class NFTUtil {
         String formattedId = generateId(bufferedNFT.getAddress(), bufferedNFT.getTokenId());
         NFT snft = ANFT.getInstance().getNFT(formattedId);
         if (snft != null) {
+
+            if (size.getW() * 128 != snft.getW()
+            && size.getH() * 128 != snft.getH()) {
+                snft.getImage().setImage(ImageUtil.resizeImage(snft.getImage().getImage(), size.getW() * 128, size.getH() * 128));
+                snft.setW(size.getW() * 128);
+                snft.setH(size.getH() * 128);
+                snft.frames();
+                snft.save();
+            }
+
             player.getInventory().addItem(snft.asItemStack(player.getWorld()));
 
             new MessageSender(player)
@@ -43,29 +119,51 @@ public class NFTUtil {
             return;
         }
 
-        if (!imageNFT.load()) {
-            new MessageSender(player)
-                    .path("response-error")
-                    .replace("code", "?")
-                    .replace("description", "???")
-                    .run();
-            return;
-        }
 
-        NFT nft = new NFT(formattedId, size.getW() * 128, size.getH() * 128, bufferedNFT.getTokenId(), bufferedNFT.getName(), bufferedNFT.getDescription(), player.getUniqueId(), imageNFT);
-        nft.frames();
-        nft.create(true);
+        new BukkitRunnable() {
 
-        playerNFT.getNfts().add(nft);
-        playerNFT.save();
+            @Override
+            public void run() {
 
-        player.getInventory().addItem(nft.asItemStack(player.getWorld()));
+                if (!imageNFT.load()) {
+                    new MessageSender(player)
+                            .path("response-error")
+                            .replace("code", "?")
+                            .replace("description", "???")
+                            .run();
+                    return;
+                }
 
-        new MessageSender(player)
-                .path("given-nft")
-                .run();
+                NFT nft = new NFT(formattedId, size.getW() * 128, size.getH() * 128, bufferedNFT.getTokenId(), bufferedNFT.getName(), bufferedNFT.getDescription(), player.getUniqueId(), imageNFT);
+                nft.frames();
+                nft.create(true);
+
+                playerNFT.getNfts().add(nft);
+                playerNFT.save();
+
+
+                new BukkitRunnable() {
+
+                    @Override
+                    public void run() {
+                        player.getInventory().addItem(nft.asItemStack(player.getWorld()));
+                    }
+
+                }.runTask(ANFT.getInstance());
+
+                new MessageSender(player)
+                        .path("given-nft")
+                        .run();
+
+            }
+
+        }.runTaskAsynchronously(ANFT.getInstance());
 
     }
+
+    /*
+     *  Выдача существующего нфт игроку
+     */
 
     public static void giveNFT(Player player, NFT nft, Size size) {
 
@@ -73,6 +171,15 @@ public class NFTUtil {
                 .path("nft-loading")
                 .run();
 
+        if (size.getW() * 128 != nft.getW()
+                && size.getH() * 128 != nft.getH()) {
+            nft.getImage().setImage(ImageUtil.resizeImage(nft.getImage().getImage(), size.getW() * 128, size.getH() * 128));
+            nft.setW(size.getW() * 128);
+            nft.setH(size.getH() * 128);
+            nft.frames();
+            nft.save();
+        }
+
         player.getInventory().addItem(nft.asItemStack(player.getWorld()));
 
         new MessageSender(player)
@@ -81,9 +188,17 @@ public class NFTUtil {
 
     }
 
+    /*
+     *  Генерация айди из адреса и токена
+     */
+
     public static String generateId(String address, int tokenId) {
         return address + "-" + tokenId;
     }
+
+    /*
+     *  Проверяем может ли находиться в рамке нфт
+     */
 
     public static boolean checkFrame(Location location, BlockFace face, double x, double y, double z) {
         Location resultLocation = new Location(location.getWorld(), x, y, z);
@@ -92,8 +207,18 @@ public class NFTUtil {
         if (frame == null) {
             return true;
         }
+
+        if (frame.getItem().getType() != Material.AIR) {
+            return true;
+        }
+
         return false;
     }
+
+    /*
+     *  Проверяем все соседние рамки от основного на способность
+     *  содержания части НФТ (фигура)
+     */
 
     public static boolean checkFrames(Location location, NFT nft,
                                       BlockFace face, Orient orient) {
@@ -136,6 +261,10 @@ public class NFTUtil {
         return true;
     }
 
+    /*
+     *  Создаём рендер и ставим часть НФТ (фигура) в рамку
+     */
+
     public static void populateFrame(World world, Location location, NFT nft, BlockFace face, Orient orient, double x, double y, double z, int fw, int fh) {
         Location resultLocation = new Location(location.getWorld(), x, y, z);
         ItemFrame frame = FrameUtil.getFrame(resultLocation, face);
@@ -155,9 +284,14 @@ public class NFTUtil {
         PersistentDataContainer container = mapMeta.getPersistentDataContainer();
         container.set(ANFT.getInstance().getKey(), PersistentDataType.STRING, nft.getId());
         itemStack.setItemMeta(mapMeta);
+        figure.setMapId(view.getId());
 
         frame.setItem(itemStack);
     }
+
+    /*
+     *  Устанавливаем НФТ в рамки (выполняется после проверки)
+     */
 
     public static void populateFrames(World world, Location location, NFT nft, BlockFace face, Orient orient) {
         int fw = 0, fh = 0;
@@ -223,17 +357,22 @@ public class NFTUtil {
         }
     }
 
+    /*
+     *  Очищаем рамку
+     */
+
     public static void clearFrame(ItemFrame frame, Location location, double x, double y, double z) {
         Location resultLocation = new Location(location.getWorld(), x, y, z);
         ItemFrame fr = FrameUtil.getFrame(resultLocation, frame.getFacing());
+        if (fr == null) return;
         fr.setItem(null);
     }
 
-    public static void breakNFT(ItemFrame frame, Location location, Orient orient) {
+    /*
+     *  Ломаем НФТ, идёт проверка соседних рамок на наличие нфт
+     */
 
-        System.out.println("x: " + orient.getXa() + " / " + orient.getXb());
-        System.out.println("y: " + orient.getYa() + " / " + orient.getYb());
-        System.out.println("z: " + orient.getZa() + " / " + orient.getZb());
+    public static void breakNFT(ItemFrame frame, Location location, Orient orient) {
 
         double x, y, z;
         switch (orient.getSide()) {

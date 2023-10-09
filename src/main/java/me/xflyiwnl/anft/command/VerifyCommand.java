@@ -62,6 +62,13 @@ public class VerifyCommand implements CommandExecutor, TabCompleter {
             return true;
         }
 
+        if (playerNFT.isVerified()) {
+            new MessageSender(player)
+                    .path("already-verified")
+                    .run();
+            return true;
+        }
+
         verifyCommand(player, playerNFT, args);
 
         return true;
@@ -70,7 +77,7 @@ public class VerifyCommand implements CommandExecutor, TabCompleter {
     public void verifyCommand(Player player, PlayerNFT playerNFT, String[] args) {
 
         JSONObject json = new JSONObject();
-        json.put("username", args[1]);
+        json.put("username", player.getName());
         json.put("signature", args[0]);
 
         HttpResponse<String> response = new PostRequest()

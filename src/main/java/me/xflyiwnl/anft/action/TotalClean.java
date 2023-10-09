@@ -7,17 +7,17 @@ import me.xflyiwnl.anft.object.nft.Point;
 import me.xflyiwnl.anft.object.orient.Orient;
 import me.xflyiwnl.anft.object.orient.OrientSide;
 import me.xflyiwnl.anft.util.FrameUtil;
-import me.xflyiwnl.anft.util.NFTUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
-import org.bukkit.World;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.*;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
 
 public class TotalClean implements Action {
 

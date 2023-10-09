@@ -1,7 +1,6 @@
 package me.xflyiwnl.anft;
 
 import me.xflyiwnl.anft.config.YAML;
-import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
 

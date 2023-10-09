@@ -1,7 +1,7 @@
 package me.xflyiwnl.anft.command;
 
-import com.google.gson.*;
-import com.google.gson.stream.JsonReader;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import me.xflyiwnl.anft.ANFT;
 import me.xflyiwnl.anft.chat.MessageSender;
 import me.xflyiwnl.anft.object.Error;
@@ -15,9 +15,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
 
-import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.Arrays;
 import java.util.List;

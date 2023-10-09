@@ -7,7 +7,9 @@ import me.xflyiwnl.anft.object.nft.Point;
 import me.xflyiwnl.anft.render.NFTRenderer;
 import me.xflyiwnl.anft.util.ImageUtil;
 import me.xflyiwnl.colorfulgui.util.TextUtil;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.MapMeta;
@@ -15,7 +17,6 @@ import org.bukkit.map.MapView;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 
-import javax.imageio.ImageIO;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;

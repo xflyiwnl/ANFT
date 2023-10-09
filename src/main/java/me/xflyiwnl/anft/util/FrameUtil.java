@@ -4,7 +4,6 @@ import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.ItemFrame;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 

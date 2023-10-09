@@ -4,9 +4,9 @@ import me.xflyiwnl.anft.ANFT;
 import me.xflyiwnl.anft.chat.MessageSender;
 import me.xflyiwnl.anft.object.NFT;
 import me.xflyiwnl.anft.object.PlayerNFT;
+import me.xflyiwnl.anft.object.nft.Point;
 import me.xflyiwnl.anft.object.orient.Orient;
 import me.xflyiwnl.anft.object.orient.OrientSide;
-import me.xflyiwnl.anft.object.nft.Point;
 import me.xflyiwnl.anft.util.NFTUtil;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -17,8 +17,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.MapMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
-
-import java.util.UUID;
 
 public class PlaceNFT implements Action {
 

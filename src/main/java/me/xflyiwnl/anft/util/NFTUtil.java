@@ -2,7 +2,10 @@ package me.xflyiwnl.anft.util;
 
 import me.xflyiwnl.anft.ANFT;
 import me.xflyiwnl.anft.chat.MessageSender;
-import me.xflyiwnl.anft.object.*;
+import me.xflyiwnl.anft.object.BufferedNFT;
+import me.xflyiwnl.anft.object.NFT;
+import me.xflyiwnl.anft.object.PlayerNFT;
+import me.xflyiwnl.anft.object.Size;
 import me.xflyiwnl.anft.object.nft.Figure;
 import me.xflyiwnl.anft.object.nft.ImageNFT;
 import me.xflyiwnl.anft.object.orient.Orient;

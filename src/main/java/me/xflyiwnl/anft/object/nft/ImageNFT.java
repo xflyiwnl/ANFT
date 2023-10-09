@@ -1,8 +1,5 @@
 package me.xflyiwnl.anft.object.nft;
 
-import me.xflyiwnl.anft.ANFT;
-import org.bukkit.scheduler.BukkitRunnable;
-
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;

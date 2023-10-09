@@ -1,8 +1,5 @@
 package me.xflyiwnl.anft.database.data;
 
-import me.xflyiwnl.anft.object.NFT;
-import me.xflyiwnl.anft.object.NFTObject;
-
 import java.io.File;
 import java.util.List;
 import java.util.UUID;

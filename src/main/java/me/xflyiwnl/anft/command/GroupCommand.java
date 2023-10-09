@@ -1,7 +1,6 @@
 package me.xflyiwnl.anft.command;
 
 import me.xflyiwnl.anft.ANFT;
-import me.xflyiwnl.anft.chat.MessageSender;
 import me.xflyiwnl.anft.object.Group;
 import me.xflyiwnl.anft.object.PlayerNFT;
 import me.xflyiwnl.anft.object.Translator;
@@ -12,7 +11,6 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
-import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

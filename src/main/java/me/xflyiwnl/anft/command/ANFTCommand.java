@@ -6,9 +6,8 @@ import com.google.gson.JsonObject;
 import me.xflyiwnl.anft.ANFT;
 import me.xflyiwnl.anft.chat.MessageSender;
 import me.xflyiwnl.anft.gui.NFTGUI;
-import me.xflyiwnl.anft.object.*;
 import me.xflyiwnl.anft.object.Error;
-import me.xflyiwnl.anft.request.GetRequest;
+import me.xflyiwnl.anft.object.*;
 import me.xflyiwnl.anft.request.PostRequest;
 import me.xflyiwnl.anft.util.NFTUtil;
 import org.bukkit.command.Command;
@@ -21,7 +20,6 @@ import java.net.http.HttpResponse;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 
 public class ANFTCommand implements CommandExecutor {
 

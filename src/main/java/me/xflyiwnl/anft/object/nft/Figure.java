@@ -4,8 +4,6 @@ import me.xflyiwnl.anft.object.NFT;
 import me.xflyiwnl.anft.object.NFTObject;
 import me.xflyiwnl.anft.object.Scaleable;
 
-import java.util.UUID;
-
 public class Figure extends NFTObject implements Scaleable {
 
     private NFT nft;

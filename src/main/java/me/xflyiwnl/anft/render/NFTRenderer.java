@@ -1,8 +1,8 @@
 package me.xflyiwnl.anft.render;
 
 import me.xflyiwnl.anft.ANFT;
-import me.xflyiwnl.anft.object.nft.ImageNFT;
 import me.xflyiwnl.anft.object.PlayerNFT;
+import me.xflyiwnl.anft.object.nft.ImageNFT;
 import org.bukkit.entity.Player;
 import org.bukkit.map.MapCanvas;
 import org.bukkit.map.MapPalette;

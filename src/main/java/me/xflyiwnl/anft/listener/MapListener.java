@@ -1,6 +1,5 @@
 package me.xflyiwnl.anft.listener;
 
-import com.destroystokyo.paper.event.block.BlockDestroyEvent;
 import me.xflyiwnl.anft.ANFT;
 import me.xflyiwnl.anft.action.BreakNFT;
 import me.xflyiwnl.anft.action.PlaceNFT;
@@ -11,9 +10,7 @@ import me.xflyiwnl.anft.object.nft.ImageNFT;
 import me.xflyiwnl.anft.render.NFTRenderer;
 import me.xflyiwnl.anft.util.FrameUtil;
 import me.xflyiwnl.anft.util.NFTUtil;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Entity;
@@ -23,24 +20,17 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.block.BlockExplodeEvent;
 import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
-import org.bukkit.event.entity.*;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
-import org.bukkit.event.hanging.HangingBreakEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.server.MapInitializeEvent;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.MapMeta;
 import org.bukkit.map.MapView;
-import org.bukkit.persistence.PersistentDataContainer;
-import org.bukkit.persistence.PersistentDataType;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class MapListener implements Listener {
 

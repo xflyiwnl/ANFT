@@ -2,9 +2,7 @@ package me.xflyiwnl.anft.database.data;
 
 import me.xflyiwnl.anft.ANFT;
 import me.xflyiwnl.anft.object.Group;
-import me.xflyiwnl.anft.object.NFT;
 import me.xflyiwnl.anft.object.PlayerNFT;
-import me.xflyiwnl.anft.object.serialize.NFTSerialize;
 import me.xflyiwnl.anft.object.serialize.PlayerSerialize;
 import org.bukkit.configuration.file.YamlConfiguration;
 

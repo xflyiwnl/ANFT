@@ -6,9 +6,6 @@ import me.xflyiwnl.anft.database.data.NFTData;
 import me.xflyiwnl.anft.database.data.PlayerData;
 import me.xflyiwnl.anft.object.NFT;
 import me.xflyiwnl.anft.object.PlayerNFT;
-import org.bukkit.scheduler.BukkitRunnable;
-
-import java.io.File;
 
 public class FlatFileSource implements DataSource {
 

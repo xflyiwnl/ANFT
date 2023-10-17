@@ -22,11 +22,19 @@ public class HashedNFT {
     }
 
     public void create() {
-        ANFT.getInstance().getHashedNFTS().add(this);
+        if (uniqueId != null) {
+            ANFT.getInstance().getHashedUUIDMap().put(uniqueId, this);
+        } else if (address != null) {
+            ANFT.getInstance().getHashedNFTS().put(address, this);
+        }
     }
 
     public void remove() {
-        ANFT.getInstance().getHashedNFTS().remove(this);
+        if (uniqueId != null) {
+            ANFT.getInstance().getHashedUUIDMap().remove(uniqueId);
+        } else if (address != null) {
+            ANFT.getInstance().getHashedNFTS().remove(address);
+        }
     }
 
     public UUID getUniqueId() {

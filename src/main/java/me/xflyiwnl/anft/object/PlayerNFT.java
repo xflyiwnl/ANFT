@@ -33,7 +33,7 @@ public class PlayerNFT implements Identifyable {
     }
 
     public void create(boolean save) {
-        ANFT.getInstance().getPlayers().add(this);
+        ANFT.getInstance().getPlayers().put(uniqueId, this);
         if (save) save();
     }
 
@@ -43,7 +43,7 @@ public class PlayerNFT implements Identifyable {
 
     public void remove() {
         ANFT.getInstance().getFlatFileSource().getPlayerData().remove(this);
-        ANFT.getInstance().getPlayers().remove(this);
+        ANFT.getInstance().getPlayers().remove(uniqueId);
     }
 
     public NFT getNFT(String id) {

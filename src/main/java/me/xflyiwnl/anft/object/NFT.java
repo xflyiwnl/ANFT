@@ -89,7 +89,7 @@ public class NFT extends NFTObject implements Saveable {
 
     @Override
     public void create(boolean save) {
-        ANFT.getInstance().getNfts().add(this);
+        ANFT.getInstance().getNfts().put(getId(), this);
         if (save) {
             save();
         }
@@ -102,13 +102,14 @@ public class NFT extends NFTObject implements Saveable {
 
     @Override
     public void remove() {
-        for (PlayerNFT playerNFT : ANFT.getInstance().getPlayers()) {
+        for (UUID id : ANFT.getInstance().getPlayers().keySet()) {
+            PlayerNFT playerNFT = ANFT.getInstance().getPlayer(id);
             if (playerNFT.getNfts().contains(this)) {
                 playerNFT.getNfts().remove(this);
                 playerNFT.save();
             }
         }
-        ANFT.getInstance().getNfts().remove(this);
+        ANFT.getInstance().getNfts().remove(getId());
         ANFT.getInstance().getFlatFileSource().getNftData().remove(this);
     }
 

@@ -17,9 +17,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 public final class ANFT extends JavaPlugin {
 
@@ -30,12 +28,14 @@ public final class ANFT extends JavaPlugin {
     private NamespacedKey key = new NamespacedKey(this, "anft");
     private ColorfulGUI colorfulGUI;
 
-    private List<Group> groups = new ArrayList<Group>();
-    private List<NFT> nfts = new ArrayList<NFT>();
-    private List<PlayerNFT> players = new ArrayList<PlayerNFT>();
+    private Map<String, Group> groups = new HashMap<String, Group>();
+    private Map<String, NFT> nfts = new HashMap<String, NFT>();
+    private Map<UUID, PlayerNFT> players = new HashMap<UUID, PlayerNFT>();
+    private Map<Integer, Error> errors = new HashMap<Integer, Error>();
+    private Map<String, HashedNFT> hashedNFTS = new HashMap<String, HashedNFT>();
+    private Map<UUID, HashedNFT> hashedUUIDMap = new HashMap<UUID, HashedNFT>();
+
     private List<Size> sizes = new ArrayList<Size>();
-    private List<Error> errors = new ArrayList<Error>();
-    private List<HashedNFT> hashedNFTS = new ArrayList<HashedNFT>();
     private List<Chunk> chunks = new ArrayList<Chunk>();
 
     private int limitW = 10, limitH = 10;
@@ -112,7 +112,7 @@ public final class ANFT extends JavaPlugin {
             String description = yaml.getString(path + "description");
 
             Error error = new Error(code, description);
-            errors.add(error);
+            errors.put(error.getCode(), error);
 
         }
     }
@@ -130,12 +130,12 @@ public final class ANFT extends JavaPlugin {
      */
 
     public Error getError(int code) {
-        for (Error error : errors) {
-            if (error.getCode() == code) {
-                return error;
-            }
+        Error error = errors.get(code);
+        if (error == null) {
+            return new Error(code);
+        } else {
+            return error;
         }
-        return new Error(code);
     }
 
     /*
@@ -169,7 +169,7 @@ public final class ANFT extends JavaPlugin {
             Group group = new Group(
                     name, limit, isdefault
             );
-            groups.add(group);
+            groups.put(name, group);
             if (group.isDefault()) {
                 defaultGroup = group;
             }
@@ -198,12 +198,7 @@ public final class ANFT extends JavaPlugin {
      */
 
     public NFT getNFT(String id) {
-        for (NFT nft : nfts) {
-            if (nft.getId().equals(id)) {
-                return nft;
-            }
-        }
-        return null;
+        return nfts.get(id);
     }
 
     /*
@@ -211,7 +206,8 @@ public final class ANFT extends JavaPlugin {
      */
 
     public Figure getFigure(int mapId) {
-        for (NFT nft : nfts) {
+        for (String id : nfts.keySet()) {
+            NFT nft = nfts.get(id);
             if (!nft.isPlaced()) {
                 continue;
             }
@@ -229,12 +225,7 @@ public final class ANFT extends JavaPlugin {
      */
 
     public PlayerNFT getPlayer(UUID uniqueId) {
-        for (PlayerNFT player : players) {
-            if (player.getUniqueId().equals(uniqueId)) {
-                return player;
-            }
-        }
-        return null;
+        return players.get(uniqueId);
     }
 
     /*
@@ -242,12 +233,7 @@ public final class ANFT extends JavaPlugin {
      */
 
     public Group getGroup(String name) {
-        for (Group group : groups) {
-            if (group.getName().equalsIgnoreCase(name)) {
-                return group;
-            }
-        }
-        return defaultGroup;
+        return groups.get(name);
     }
 
     /*
@@ -256,12 +242,7 @@ public final class ANFT extends JavaPlugin {
      */
 
     public HashedNFT getHashedNFT(UUID uniqueId) {
-        for (HashedNFT hashedNFT : hashedNFTS) {
-            if (hashedNFT.getUniqueId() != null && hashedNFT.getUniqueId().equals(uniqueId)) {
-                return hashedNFT;
-            }
-        }
-        return null;
+        return hashedUUIDMap.get(uniqueId);
     }
 
     /*
@@ -270,12 +251,7 @@ public final class ANFT extends JavaPlugin {
      */
 
     public HashedNFT getHashedNFT(String address) {
-        for (HashedNFT hashedNFT : hashedNFTS) {
-            if (hashedNFT.getAddress() != null && hashedNFT.getAddress().equalsIgnoreCase(address)) {
-                return hashedNFT;
-            }
-        }
-        return null;
+        return hashedNFTS.get(address);
     }
 
     public FileManager getFileManager() {
@@ -284,14 +260,6 @@ public final class ANFT extends JavaPlugin {
 
     public NamespacedKey getKey() {
         return key;
-    }
-
-    public List<PlayerNFT> getPlayers() {
-        return players;
-    }
-
-    public List<NFT> getNfts() {
-        return nfts;
     }
 
     public FlatFileSource getFlatFileSource() {
@@ -318,27 +286,39 @@ public final class ANFT extends JavaPlugin {
         return limitH;
     }
 
-    public List<Error> getErrors() {
-        return errors;
-    }
-
     public String getWebserver() {
         return webserver;
-    }
-
-    public List<Group> getGroups() {
-        return groups;
     }
 
     public Group getDefaultGroup() {
         return defaultGroup;
     }
 
-    public List<HashedNFT> getHashedNFTS() {
+    public List<Chunk> getChunks() {
+        return chunks;
+    }
+
+    public Map<String, Group> getGroups() {
+        return groups;
+    }
+
+    public Map<String, NFT> getNfts() {
+        return nfts;
+    }
+
+    public Map<UUID, PlayerNFT> getPlayers() {
+        return players;
+    }
+
+    public Map<Integer, Error> getErrors() {
+        return errors;
+    }
+
+    public Map<String, HashedNFT> getHashedNFTS() {
         return hashedNFTS;
     }
 
-    public List<Chunk> getChunks() {
-        return chunks;
+    public Map<UUID, HashedNFT> getHashedUUIDMap() {
+        return hashedUUIDMap;
     }
 }

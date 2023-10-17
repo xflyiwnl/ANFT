@@ -13,6 +13,7 @@ import me.xflyiwnl.anft.object.orient.OrientSide;
 import me.xflyiwnl.anft.render.NFTRenderer;
 import org.bukkit.*;
 import org.bukkit.block.BlockFace;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -166,6 +167,15 @@ public class NFTUtil {
                             .path("response-error")
                             .replace("code", "?")
                             .replace("description", "???")
+                            .run();
+                    return;
+                }
+
+                FileConfiguration s = ANFT.getInstance().getFileManager().getSettings().yaml();
+                if (image.getWidth() > s.getInt("settings.image-size-limit.w") &&
+                image.getHeight() > s.getInt("settings.image-size-limit.h")) {
+                    new MessageSender(player)
+                            .path("image-size-limit")
                             .run();
                     return;
                 }

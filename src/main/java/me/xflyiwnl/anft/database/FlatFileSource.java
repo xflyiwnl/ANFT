@@ -20,7 +20,7 @@ public class FlatFileSource implements DataSource {
         playerData.load();
         nftData.load();
 
-        ANFT.getInstance().getNfts().forEach(nft -> {
+        ANFT.getInstance().getNfts().forEach((s, nft) -> {
             PlayerNFT playerNFT = ANFT.getInstance().getPlayer(nft.getOwner());
             if (playerNFT == null) {
                 return;
@@ -34,8 +34,12 @@ public class FlatFileSource implements DataSource {
 
     @Override
     public void unload() {
-        ANFT.getInstance().getNfts().forEach(NFT::save);
-        ANFT.getInstance().getPlayers().forEach(PlayerNFT::save);
+        ANFT.getInstance().getNfts().forEach((s, nft) -> {
+            nft.save();
+        });
+        ANFT.getInstance().getPlayers().forEach((uuid, playerNFT) -> {
+            playerNFT.save();
+        });
     }
 
     public FileManager getManager() {

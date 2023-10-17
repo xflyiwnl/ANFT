@@ -76,7 +76,7 @@ public class GroupCommand implements CommandExecutor, TabCompleter {
         } else if (args.length == 3) {
             List<String> groups = new ArrayList<String>();
             ANFT.getInstance().getGroups().forEach(
-                    group -> {
+                    (s, group) -> {
                         groups.add(group.getName());
                     }
             );

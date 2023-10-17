@@ -16,6 +16,7 @@ import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
@@ -32,7 +33,10 @@ public class TotalClean implements Action {
     @Override
     public boolean execute() {
 
-        List<NFT> nfts = ANFT.getInstance().getNfts();
+        List<NFT> nfts = new ArrayList<NFT>();
+        ANFT.getInstance().getNfts().forEach(((s, nft) -> {
+            nfts.add(nft);
+        }));
         Queue<NFT> queuedNfts = new LinkedList<NFT>(nfts);
 
         broadcast(new MessageSender().path("nft-rma-started"));

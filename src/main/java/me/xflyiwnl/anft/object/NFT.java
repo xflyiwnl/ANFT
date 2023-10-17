@@ -17,6 +17,7 @@ import org.bukkit.map.MapView;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -34,6 +35,9 @@ public class NFT extends NFTObject implements Saveable {
 
     private Point point;
     private boolean isPlaced = false;
+    private boolean loaded = false;
+
+    private ItemStack itemStack;
 
     public NFT() {
     }
@@ -42,7 +46,6 @@ public class NFT extends NFTObject implements Saveable {
         super(w, h);
         this.owner = owner;
         this.image = image;
-        image.setImage(ImageUtil.resizeImage(image.getImage(), w, h));
     }
 
     public NFT(String id, int w, int h, int tokenId, String name, String description, UUID owner, ImageNFT image) {
@@ -52,14 +55,12 @@ public class NFT extends NFTObject implements Saveable {
         this.description = description;
         this.owner = owner;
         this.image = image;
-        image.setImage(ImageUtil.resizeImage(image.getImage(), w, h));
     }
 
     public NFT(int w, int h, ImageNFT image, List<Figure> figures) {
         super(w, h);
         this.image = image;
         this.figures = figures;
-        image.setImage(ImageUtil.resizeImage(image.getImage(), getW(), getH()));
     }
 
     public void locate() {
@@ -147,7 +148,10 @@ public class NFT extends NFTObject implements Saveable {
 
     public ItemStack asItemStack(World world) {
 
-        NFTRenderer renderer = new NFTRenderer(image);
+        if (itemStack != null) return itemStack;
+
+        BufferedImage img = image.loadFromStorage();
+        NFTRenderer renderer = new NFTRenderer(img);
 
         MapView view = Bukkit.createMap(world);
         view.getRenderers().clear();
@@ -177,6 +181,8 @@ public class NFT extends NFTObject implements Saveable {
         mapMeta.setLore(TextUtil.colorize(lore));
 
         itemStack.setItemMeta(mapMeta);
+
+        if (this.itemStack == null) this.itemStack = itemStack;
 
         return itemStack;
     }
@@ -227,5 +233,21 @@ public class NFT extends NFTObject implements Saveable {
 
     public void setPlaced(boolean placed) {
         isPlaced = placed;
+    }
+
+    public boolean isLoaded() {
+        return loaded;
+    }
+
+    public void setLoaded(boolean loaded) {
+        this.loaded = loaded;
+    }
+
+    public ItemStack getItemStack() {
+        return itemStack;
+    }
+
+    public void setItemStack(ItemStack itemStack) {
+        this.itemStack = itemStack;
     }
 }

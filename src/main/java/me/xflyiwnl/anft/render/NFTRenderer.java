@@ -10,11 +10,13 @@ import org.bukkit.map.MapRenderer;
 import org.bukkit.map.MapView;
 import org.jetbrains.annotations.NotNull;
 
+import java.awt.image.BufferedImage;
+
 public class NFTRenderer extends MapRenderer {
 
-    private ImageNFT image;
+    private BufferedImage image;
 
-    public NFTRenderer(ImageNFT image) {
+    public NFTRenderer(BufferedImage image) {
         this.image = image;
     }
 
@@ -22,18 +24,13 @@ public class NFTRenderer extends MapRenderer {
     public void render(@NotNull MapView map, @NotNull MapCanvas canvas, @NotNull Player player) {
         PlayerNFT playerNFT = ANFT.getInstance().getPlayer(player.getUniqueId());
         if (!playerNFT.getRendered().contains(map.getId())) {
-            canvas.drawImage(0, 0, MapPalette.resizeImage(image.getImage()));
+            canvas.drawImage(0, 0, MapPalette.resizeImage(image));
             map.setTrackingPosition(false);
             playerNFT.getRendered().add(map.getId());
         }
     }
 
-    public void change(ImageNFT image) {
-        this.image = image;
-    }
-
-    public ImageNFT get() {
+    public BufferedImage getImage() {
         return image;
     }
-
 }

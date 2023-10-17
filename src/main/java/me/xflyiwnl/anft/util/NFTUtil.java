@@ -11,10 +11,7 @@ import me.xflyiwnl.anft.object.nft.ImageNFT;
 import me.xflyiwnl.anft.object.orient.Orient;
 import me.xflyiwnl.anft.object.orient.OrientSide;
 import me.xflyiwnl.anft.render.NFTRenderer;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
@@ -25,9 +22,34 @@ import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class NFTUtil {
+
+    public static NFT getNFTfromMap(ItemStack itemStack) {
+        if (itemStack.getType() != Material.FILLED_MAP) {
+            return null;
+        }
+        MapMeta itemMeta = (MapMeta) itemStack.getItemMeta();
+        if (itemMeta == null) {
+            return null;
+        }
+        PersistentDataContainer container = itemMeta.getPersistentDataContainer();
+        if (!container.has(ANFT.getInstance().getKey(), PersistentDataType.STRING)) {
+            return null;
+        }
+        String uniqueId = container.get(ANFT.getInstance().getKey(), PersistentDataType.STRING);
+        NFT nft = ANFT.getInstance().getNFT(uniqueId);
+        if (nft == null) {
+            return null;
+        }
+        return nft;
+    }
 
     /*
      *  Проверяем содержит ли рамка НФТ
@@ -95,7 +117,6 @@ public class NFTUtil {
     public static void giveNFT(Player player, BufferedNFT bufferedNFT, Size size) {
 
         PlayerNFT playerNFT = ANFT.getInstance().getPlayer(player.getUniqueId());
-        ImageNFT imageNFT = new ImageNFT(bufferedNFT.getUrl());
 
         new MessageSender(player)
                 .path("nft-loading")
@@ -105,20 +126,29 @@ public class NFTUtil {
         NFT snft = ANFT.getInstance().getNFT(formattedId);
         if (snft != null) {
 
-            if (size.getW() * 128 != snft.getW()
-            && size.getH() * 128 != snft.getH()) {
-                snft.getImage().setImage(ImageUtil.resizeImage(snft.getImage().getImage(), size.getW() * 128, size.getH() * 128));
-                snft.setW(size.getW() * 128);
-                snft.setH(size.getH() * 128);
-                snft.frames();
-                snft.save();
-            }
+            new BukkitRunnable() {
 
-            player.getInventory().addItem(snft.asItemStack(player.getWorld()));
+                @Override
+                public void run() {
 
-            new MessageSender(player)
-                    .path("given-nft")
-                    .run();
+                    if (size.getW() * 128 != snft.getW()
+                            && size.getH() * 128 != snft.getH()) {
+//                        snft.getImage().setImage(ImageUtil.resizeImage(image, size.getW() * 128, size.getH() * 128));
+                        snft.setW(size.getW() * 128);
+                        snft.setH(size.getH() * 128);
+                        snft.frames();
+                        snft.save();
+                    }
+
+                    player.getInventory().addItem(snft.asItemStack(player.getWorld()));
+
+                    new MessageSender(player)
+                            .path("given-nft")
+                            .run();
+                }
+
+            }.runTaskAsynchronously(ANFT.getInstance());
+
             return;
         }
 
@@ -128,7 +158,10 @@ public class NFTUtil {
             @Override
             public void run() {
 
-                if (!imageNFT.load()) {
+                ImageNFT imageNFT = new ImageNFT(bufferedNFT.getUrl());
+                BufferedImage image = imageNFT.load();
+
+                if (image == null) {
                     new MessageSender(player)
                             .path("response-error")
                             .replace("code", "?")
@@ -140,6 +173,14 @@ public class NFTUtil {
                 NFT nft = new NFT(formattedId, size.getW() * 128, size.getH() * 128, bufferedNFT.getTokenId(), bufferedNFT.getName(), bufferedNFT.getDescription(), player.getUniqueId(), imageNFT);
                 nft.frames();
                 nft.create(true);
+
+                File path = new File(ANFT.getInstance().getFileManager().getImageFolder().getPath(), nft.getId() + ".png");
+                try {
+                    ImageIO.write(image, "png", path);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                nft.getImage().setImage(path);
 
                 playerNFT.getNfts().add(nft);
                 playerNFT.save();
@@ -176,7 +217,7 @@ public class NFTUtil {
 
         if (size.getW() * 128 != nft.getW()
                 && size.getH() * 128 != nft.getH()) {
-            nft.getImage().setImage(ImageUtil.resizeImage(nft.getImage().getImage(), size.getW() * 128, size.getH() * 128));
+//            nft.getImage().setImage(ImageUtil.resizeImage(nft.getImage().getImage(), size.getW() * 128, size.getH() * 128));
             nft.setW(size.getW() * 128);
             nft.setH(size.getH() * 128);
             nft.frames();
@@ -268,14 +309,13 @@ public class NFTUtil {
      *  Создаём рендер и ставим часть НФТ (фигура) в рамку
      */
 
-    public static void populateFrame(World world, Location location, NFT nft, BlockFace face, Orient orient, double x, double y, double z, int fw, int fh) {
+    public static void populateFrame(BufferedImage image, World world, Location location, NFT nft, BlockFace face, Orient orient, double x, double y, double z, int fw, int fh) {
         Location resultLocation = new Location(location.getWorld(), x, y, z);
         ItemFrame frame = FrameUtil.getFrame(resultLocation, face);
 
         Figure figure = nft.getFigure(fw * 128, fh * 128);
-        ImageNFT image = nft.getImage();
 
-        NFTRenderer renderer = new NFTRenderer(image.clone().crop(fw * 128, fh * 128));
+        NFTRenderer renderer = new NFTRenderer(ImageUtil.crop(image, fw * 128, fh * 128));
 
         MapView view = Bukkit.createMap(world);
         view.getRenderers().clear();
@@ -297,6 +337,7 @@ public class NFTUtil {
      */
 
     public static void populateFrames(World world, Location location, NFT nft, BlockFace face, Orient orient) {
+        BufferedImage image = ImageUtil.resizeImage(nft.getImage().loadFromStorage(), nft.getW(), nft.getH());
         int fw = 0, fh = 0;
         double x, y, z;
         switch (orient.getSide()) {
@@ -306,7 +347,7 @@ public class NFTUtil {
                 x = location.getX();
                 for (z = orient.getZa(); z <= orient.getZb(); z++) {
                     for (y = orient.getYa(); y >= orient.getYb(); y--) {
-                        populateFrame(world, location, nft, face, orient, x, y, z, fw, fh);
+                        populateFrame(image, world, location, nft, face, orient, x, y, z, fw, fh);
                         if (nft.getH() / 128 - 1 == fh) {
                             fh = 0;
                         } else {
@@ -324,7 +365,7 @@ public class NFTUtil {
                 y = location.getY();
                 for (x = orient.getXa(); x <= orient.getXb(); x++) {
                     for (z = orient.getZa(); z >= orient.getZb(); z--) {
-                        populateFrame(world, location, nft, face, orient, x, y, z, fw, fh);
+                        populateFrame(image, world, location, nft, face, orient, x, y, z, fw, fh);
 
                         if (orient.getSide() == OrientSide.UP && fh == 0) {
                             fh = nft.getH() / 128 - 1;
@@ -345,7 +386,107 @@ public class NFTUtil {
                 z = location.getZ();
                 for (x = orient.getXa(); x <= orient.getXb(); x++) {
                     for (y = orient.getYa(); y >= orient.getYb(); y--) {
-                        populateFrame(world, location, nft, face, orient, x, y, z, fw, fh);
+                        populateFrame(image, world, location, nft, face, orient, x, y, z, fw, fh);
+                        if (nft.getH() / 128 - 1 == fh) {
+                            fh = 0;
+                        } else {
+                            fh++;
+                        }
+                    }
+                    if (orient.getSide() == OrientSide.X_SIDE_INVERTED) {
+                        fw--;
+                    } else fw++;
+                }
+                break;
+        }
+    }
+
+    public static void loadFrame(BufferedImage image, World world, Location location, NFT nft, BlockFace face, Orient orient, double x, double y, double z, int fw, int fh) {
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                Location resultLocation = new Location(location.getWorld(), x, y, z);
+                Chunk chunk = resultLocation.getChunk();
+                if (!chunk.isLoaded()) {
+                    ANFT.getInstance().getChunks().add(chunk);
+                    chunk.load();
+                }
+
+                ItemFrame frame = FrameUtil.getFrame(resultLocation, face);
+                Figure figure = nft.getFigure(fw * 128, fh * 128);
+
+                NFTRenderer renderer = new NFTRenderer(ImageUtil.crop(image, fw * 128, fh * 128));
+
+                MapView view = Bukkit.createMap(world);
+                view.getRenderers().clear();
+                view.addRenderer(renderer);
+
+                ItemStack itemStack = new ItemStack(Material.FILLED_MAP);
+                MapMeta mapMeta = (MapMeta) itemStack.getItemMeta();
+                mapMeta.setMapView(view);
+                PersistentDataContainer container = mapMeta.getPersistentDataContainer();
+                container.set(ANFT.getInstance().getKey(), PersistentDataType.STRING, nft.getId());
+                itemStack.setItemMeta(mapMeta);
+                figure.setMapId(view.getId());
+
+                frame.setItem(itemStack);
+
+                ANFT.getInstance().getChunks().remove(chunk);
+            }
+        }.runTask(ANFT.getInstance());
+    }
+
+    public static void loadFrames(World world, Location location, NFT nft, BlockFace face, Orient orient) {
+        BufferedImage image = ImageUtil.resizeImage(nft.getImage().loadFromStorage(), nft.getW(), nft.getH());
+        int fw = 0, fh = 0;
+        double x, y, z;
+        switch (orient.getSide()) {
+            case Z_SIDE:
+            case Z_SIDE_INVERTED:
+                fw = orient.getSide() == OrientSide.Z_SIDE_INVERTED ? (nft.getW() / 128 - 1) : 0;
+                x = location.getX();
+                for (z = orient.getZa(); z <= orient.getZb(); z++) {
+                    for (y = orient.getYa(); y >= orient.getYb(); y--) {
+                        loadFrame(image, world, location, nft, face, orient, x, y, z, fw, fh);
+                        if (nft.getH() / 128 - 1 == fh) {
+                            fh = 0;
+                        } else {
+                            fh++;
+                        }
+                    }
+                    if (orient.getSide() == OrientSide.Z_SIDE_INVERTED) {
+                        fw--;
+                    } else fw++;
+                }
+                break;
+            case DOWN:
+            case UP:
+                fh = orient.getSide() == OrientSide.UP ? (nft.getH() / 128 - 1) : 0;
+                y = location.getY();
+                for (x = orient.getXa(); x <= orient.getXb(); x++) {
+                    for (z = orient.getZa(); z >= orient.getZb(); z--) {
+                        loadFrame(image, world, location, nft, face, orient, x, y, z, fw, fh);
+
+                        if (orient.getSide() == OrientSide.UP && fh == 0) {
+                            fh = nft.getH() / 128 - 1;
+                        } else if (orient.getSide() == OrientSide.DOWN && fh == (nft.getH() / 128 - 1)) {
+                            fh = 0;
+                        } else {
+                            if (orient.getSide() == OrientSide.UP) {
+                                fh--;
+                            } else fh++;
+                        }
+                    }
+                    fw++;
+                }
+                break;
+            case X_SIDE:
+            case X_SIDE_INVERTED:
+                fw = orient.getSide() == OrientSide.X_SIDE_INVERTED ? (nft.getW() / 128 - 1) : 0;
+                z = location.getZ();
+                for (x = orient.getXa(); x <= orient.getXb(); x++) {
+                    for (y = orient.getYa(); y >= orient.getYb(); y--) {
+                        loadFrame(image, world, location, nft, face, orient, x, y, z, fw, fh);
                         if (nft.getH() / 128 - 1 == fh) {
                             fh = 0;
                         } else {

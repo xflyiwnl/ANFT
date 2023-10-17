@@ -8,6 +8,7 @@ import me.xflyiwnl.anft.object.nft.Point;
 import me.xflyiwnl.anft.object.orient.Orient;
 import me.xflyiwnl.anft.object.orient.OrientSide;
 import me.xflyiwnl.anft.util.NFTUtil;
+import me.xflyiwnl.anft.util.OrientUtil;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Entity;
@@ -30,118 +31,6 @@ public class PlaceNFT implements Action {
 
     public ItemStack mapItem() {
         return player.getEquipment().getItemInMainHand();
-    }
-
-    public NFT getNFTfromItem() {
-        NFT nft = null;
-
-        ItemStack mapItem = mapItem();
-        if (mapItem == null) {
-            return null;
-        }
-
-        if (mapItem.getType() != Material.FILLED_MAP) {
-            return null;
-        }
-
-        if (entity != null && !(entity instanceof ItemFrame)) {
-            return null;
-        }
-
-        MapMeta itemMeta = (MapMeta) mapItem.getItemMeta();
-        if (itemMeta == null) {
-            return null;
-        }
-
-        PersistentDataContainer container = itemMeta.getPersistentDataContainer();
-        if (!container.has(ANFT.getInstance().getKey(), PersistentDataType.STRING)) {
-            return null;
-        }
-
-        String uniqueId = container.get(ANFT.getInstance().getKey(), PersistentDataType.STRING);
-        nft = ANFT.getInstance().getNFT(uniqueId);
-        if (nft == null) {
-            return null;
-        }
-        return nft;
-    }
-
-    public Orient orient(NFT nft, Location location, OrientSide side) {
-        Orient orient = new Orient();
-        orient.setSide(side);
-
-        switch (side) {
-            case UP:
-                orient.setXa(location.getX());
-                orient.setXb(location.getX() + (nft.getW() / 128) - 1);
-
-                orient.setZa(location.getZ() + (nft.getH() / 128) - 1);
-                orient.setZb(location.getZ());
-                break;
-            case DOWN:
-                orient.setXa(location.getX());
-                orient.setXb(location.getX() + (nft.getW() / 128) - 1);
-
-                orient.setZb(location.getZ() - (nft.getH() / 128) + 1);
-                orient.setZa(location.getZ());
-                break;
-            case Z_SIDE:
-                orient.setZa(location.getZ());
-                orient.setZb(location.getZ() + (nft.getW() / 128) - 1);
-
-                orient.setYa(location.getY() + (nft.getH() / 128) - 1);
-                orient.setYb(location.getY());
-                break;
-            case Z_SIDE_INVERTED:
-                orient.setZa(location.getZ() - (nft.getW() / 128) + 1);
-                orient.setZb(location.getZ());
-
-                orient.setYa(location.getY() + (    nft.getH() / 128) - 1);
-                orient.setYb(location.getY());
-                break;
-            case X_SIDE_INVERTED:
-                orient.setXa(location.getX() - (nft.getW() / 128) + 1);
-                orient.setXb(location.getX());
-
-                orient.setYa(location.getY() + (nft.getH() / 128) - 1);
-                orient.setYb(location.getY());
-                break;
-            case X_SIDE:
-                orient.setXa(location.getX());
-                orient.setXb(location.getX() + (nft.getW() / 128) - 1);
-
-                orient.setYa(location.getY() + (nft.getH() / 128) - 1);
-                orient.setYb(location.getY());
-                break;
-            default:
-                orient.setXa(location.getX());
-                orient.setXb(location.getX() + (nft.getW() / 128) - 1);
-
-                orient.setYa(location.getY() + (nft.getH() / 128) - 1);
-                orient.setYb(location.getY());
-                break;
-        }
-
-        return orient;
-    }
-
-    public OrientSide side(ItemFrame frame) {
-        switch (frame.getFacing()) {
-            case SOUTH:
-                return OrientSide.X_SIDE;
-            case NORTH:
-                return OrientSide.X_SIDE_INVERTED;
-            case EAST:
-                return OrientSide.Z_SIDE_INVERTED;
-            case WEST:
-                return OrientSide.Z_SIDE;
-            case UP:
-                return OrientSide.UP;
-            case DOWN:
-                return OrientSide.DOWN;
-            default:
-                return OrientSide.X_SIDE;
-        }
     }
 
     public String formattedTime(double time) {
@@ -177,7 +66,7 @@ public class PlaceNFT implements Action {
     @Override
     public boolean execute() {
 
-        NFT nft = getNFTfromItem();
+        NFT nft = NFTUtil.getNFTfromMap(mapItem());
 
         if (nft == null) {
             return false;
@@ -204,8 +93,8 @@ public class PlaceNFT implements Action {
         ItemFrame frame = (ItemFrame) entity;
         Location location = entity.getLocation();
 
-        OrientSide side = side(frame);
-        Orient orient = orient(nft, location, side);
+        OrientSide side = OrientUtil.side(frame);
+        Orient orient = OrientUtil.orient(nft, location, side);
 
         if (!NFTUtil.checkFrames(entity.getLocation(), nft, frame.getFacing(), orient)) {
             new MessageSender(player)

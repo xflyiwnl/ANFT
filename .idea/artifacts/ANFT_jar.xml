@@ -1,8 +1,9 @@
 <component name="ArtifactManager">
   <artifact type="jar" name="ANFT:jar">
-    <output-path>$USER_HOME$/Desktop/vanilla/plugins</output-path>
+    <output-path>$USER_HOME$/Desktop/avanilla/plugins</output-path>
     <root id="archive" name="ANFT.jar">
       <element id="module-output" name="ANFT" />
+      <element id="extracted-dir" path="$USER_HOME$/.m2/repository/com/github/xflyiwnl/ColorfulGUI/v1.1/ColorfulGUI-v1.1.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$USER_HOME$/.m2/repository/com/google/code/gson/gson/2.10.1/gson-2.10.1.jar" path-in-jar="/" />
     </root>
   </artifact>

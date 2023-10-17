@@ -62,6 +62,8 @@ public class PlayerData implements Data<PlayerNFT> {
 
         if (folder == null) return players;
 
+        if (folder.listFiles().length == 0) return players;
+
         for (File file : folder.listFiles()) {
             PlayerNFT player = get(file);
             if (player == null) continue;

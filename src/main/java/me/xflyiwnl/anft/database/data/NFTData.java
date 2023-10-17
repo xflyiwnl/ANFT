@@ -41,8 +41,11 @@ public class NFTData implements Data<NFT> {
             nft.setOwner(UUID.fromString(map.get("owner").toString()));
         if (map.containsKey("id"))
             nft.setId(map.get("id").toString());
-        if (map.containsKey("image"))
-            nft.setImage(new ImageNFT(map.get("image").toString()));
+        if (map.containsKey("image")) {
+            File path = new File(ANFT.getInstance().getFileManager().getImageFolder().getPath(), nft.getId() + ".png");
+            nft.setImage(new ImageNFT(path, map.get("image").toString()));
+            nft.getImage().setImageLoaded(true);
+        }
         if (map.containsKey("point")) {
             String value = map.get("point").toString();
             if (!value.equalsIgnoreCase("null")) {
@@ -70,19 +73,7 @@ public class NFTData implements Data<NFT> {
         if (map.containsKey("description"))
             nft.setDescription(map.get("description").toString());
 
-        File imageFile = new File(ANFT.getInstance().getFileManager().getImageFolder().getPath(), nft.getId() + ".png");
-        if (!imageFile.exists()) {
-            return null;
-        }
-
-        BufferedImage bufferedImage = null;
-        try {
-            bufferedImage = ImageIO.read(imageFile);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        nft.getImage().setImage(ImageUtil.resizeImage(bufferedImage, nft.getW(), nft.getH()));
-        nft.getImage().setImageLoaded(true);
+//        nft.getImage().setImage(ImageUtil.resizeImage(bufferedImage, nft.getW(), nft.getH()));
 
         if (map.containsKey("figures")) {
             List<String> formatted = (List<String>) map.get("figures");
@@ -115,12 +106,6 @@ public class NFTData implements Data<NFT> {
 
         if (!exists(nft.getId())) {
             create(nft);
-        }
-
-        try {
-            ImageIO.write(nft.getImage().getImage(), "png", new File(ANFT.getInstance().getFileManager().getImageFolder().getPath(), nft.getId() + ".png"));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
         }
 
         File file = new File(ANFT.getInstance().getFileManager().getNftsFolder().getPath(), File.separator + nft.getId() + ".yml");

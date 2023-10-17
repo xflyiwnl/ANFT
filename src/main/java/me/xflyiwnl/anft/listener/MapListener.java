@@ -77,34 +77,6 @@ public class MapListener implements Listener {
     }
 
     @EventHandler
-    public void onRender(MapInitializeEvent event) {
-
-        MapView view = event.getMap();
-
-        Figure figure = ANFT.getInstance().getFigure(view.getId());
-        if (figure == null) {
-            return;
-        }
-
-        NFT nft = figure.getNft();
-        if (nft == null) {
-            return;
-        }
-
-        if (!nft.getImage().isImageLoaded()) {
-            return;
-        }
-
-        ImageNFT image = nft.getImage();
-
-        NFTRenderer renderer = new NFTRenderer(image.clone().crop(figure.getOw(), figure.getOh()));
-
-        view.getRenderers().clear();
-        view.addRenderer(renderer);
-
-    }
-
-    @EventHandler
     public void onBreak(BlockBreakEvent event) {
 
         if (event.isCancelled()) {

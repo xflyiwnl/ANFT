@@ -3,6 +3,7 @@ package me.xflyiwnl.anft.listener;
 import me.xflyiwnl.anft.ANFT;
 import me.xflyiwnl.anft.ask.AskMessage;
 import me.xflyiwnl.anft.chat.Message;
+import me.xflyiwnl.anft.object.HashedNFT;
 import me.xflyiwnl.anft.object.PlayerNFT;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -27,8 +28,12 @@ public class PlayerListener implements Listener {
     public void onQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();
         PlayerNFT playerNFT = ANFT.getInstance().getPlayer(player.getUniqueId());
+        HashedNFT hashedNFT = ANFT.getInstance().getHashedNFT(player.getUniqueId());
         if (playerNFT != null) {
             playerNFT.getRendered().clear();
+        }
+        if (hashedNFT != null) {
+            hashedNFT.remove();
         }
     }
 

@@ -2,12 +2,13 @@ package me.xflyiwnl.anft.object.nft;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 
 public class ImageNFT {
 
-    private BufferedImage image;
+    private File image;
     private String url;
     private boolean imageLoaded = false;
 
@@ -18,34 +19,40 @@ public class ImageNFT {
         this.url = url;
     }
 
-    public ImageNFT(BufferedImage image, String url) {
+    public ImageNFT(File image, String url) {
         this.image = image;
         this.url = url;
     }
 
-    public boolean load() {
+    public BufferedImage load() {
+        BufferedImage image = null;
         try {
             image = ImageIO.read(new URL(url));
-            return true;
         } catch (IOException e) {
-            return false;
+            return null;
         }
+        return image;
     }
 
-    public ImageNFT crop(int ow, int oh) {
-        image = image.getSubimage(ow, oh, 128, 128);
-        return this;
+    public BufferedImage loadFromStorage() {
+        BufferedImage image = null;
+        try {
+            image = ImageIO.read(this.image);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return image;
     }
 
     public ImageNFT clone() {
         return new ImageNFT(image, url);
     }
 
-    public BufferedImage getImage() {
+    public File getImage() {
         return image;
     }
 
-    public void setImage(BufferedImage image) {
+    public void setImage(File image) {
         this.image = image;
     }
 
@@ -64,4 +71,5 @@ public class ImageNFT {
     public void setUrl(String url) {
         this.url = url;
     }
+
 }

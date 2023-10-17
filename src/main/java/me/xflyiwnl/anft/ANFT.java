@@ -8,6 +8,7 @@ import me.xflyiwnl.anft.listener.PlayerListener;
 import me.xflyiwnl.anft.object.Error;
 import me.xflyiwnl.anft.object.*;
 import me.xflyiwnl.anft.object.nft.Figure;
+import me.xflyiwnl.anft.object.timer.HashTimer;
 import me.xflyiwnl.colorfulgui.ColorfulGUI;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
@@ -58,6 +59,8 @@ public final class ANFT extends JavaPlugin {
 
         registerCommand();
         registerListener();
+
+        new HashTimer();
 
     }
 

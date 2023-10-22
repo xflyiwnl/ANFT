@@ -3,12 +3,12 @@ package me.xflyiwnl.anft.object;
 public class BufferedNFT {
 
     private String address;
-    private int tokenId;
+    private String tokenId;
     private String name;
     private String description;
     private String url;
 
-    public BufferedNFT(String address, int tokenId, String name, String description, String url) {
+    public BufferedNFT(String address, String tokenId, String name, String description, String url) {
         this.address = address;
         this.tokenId = tokenId;
         this.name = name;
@@ -24,11 +24,11 @@ public class BufferedNFT {
         this.address = address;
     }
 
-    public int getTokenId() {
+    public String getTokenId() {
         return tokenId;
     }
 
-    public void setTokenId(int tokenId) {
+    public void setTokenId(String tokenId) {
         this.tokenId = tokenId;
     }
 

@@ -15,6 +15,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import org.json.simple.JSONObject;
 
 import java.net.http.HttpResponse;
 import java.util.ArrayList;
@@ -73,18 +74,18 @@ public class ANFTCommand implements CommandExecutor {
         long currentMillis = System.currentTimeMillis();
         if (hashedNFT != null && (currentMillis - hashedNFT.getCreatedMillis()) / 1000 <
                 ANFT.getInstance().getFileManager().getSettings().yaml().getDouble("settings.nft-hash-update-time")) {
-            for (NFT nft : playerNFT.getNfts()) {
+            for (String id : playerNFT.getNfts().keySet()) {
+                NFT nft = playerNFT.getNfts().get(id);
                 nfts.add(nft);
             }
-            List<BufferedNFT> remove = new ArrayList<BufferedNFT>();
             for (BufferedNFT hash : hashedNFT.getNfts()) {
-                if (playerNFT.getNFT(NFTUtil.generateId(hash.getAddress(), hash.getTokenId())) != null) {
-                    remove.add(hash);
+                String id = NFTUtil.generateId(hash.getAddress(), hash.getTokenId());
+                NFT nft = playerNFT.getNFT(id);
+                if (nft != null) {
                     continue;
                 }
                 buffered.add(hash);
             }
-            hashedNFT.getNfts().removeAll(remove);
         } else {
             if (hashedNFT == null) {
                 hashedNFT = new HashedNFT(args[0]);
@@ -102,6 +103,7 @@ public class ANFTCommand implements CommandExecutor {
                 throw new RuntimeException(e);
             }
             JsonObject json = new Gson().fromJson(response.body(), JsonObject.class);
+
             if (json.get("isError").getAsBoolean()) {
                 Error error = ANFT.getInstance().getError(json.get("errorId").getAsInt());
                 new MessageSender(player)
@@ -113,15 +115,15 @@ public class ANFTCommand implements CommandExecutor {
             }
             for (JsonElement element : json.get("nfts").getAsJsonArray()) {
                 JsonObject obj = element.getAsJsonObject();
-                String id = NFTUtil.generateId(obj.get("address").getAsString(), obj.get("tokenId").getAsInt());
-                NFT nft = ANFT.getInstance().getNFT(id);
+                String id = NFTUtil.generateId(obj.get("address").getAsString(), obj.get("tokenId").getAsString());
+                NFT nft = playerNFT.getNFT(id);
                 if (nft != null) {
                     nfts.add(nft);
                     continue;
                 }
                 BufferedNFT bnft = new BufferedNFT(
                         obj.get("address").getAsString(),
-                        obj.get("tokenId").getAsInt(),
+                        obj.get("tokenId").getAsString(),
                         obj.get("title").getAsString(),
                         obj.get("description").getAsString(),
                         obj.get("imageURL").getAsString()

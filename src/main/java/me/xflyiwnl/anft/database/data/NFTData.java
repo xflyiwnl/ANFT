@@ -67,7 +67,7 @@ public class NFTData implements Data<NFT> {
         if (map.containsKey("h"))
             nft.setH(Integer.valueOf(map.get("h").toString()));
         if (map.containsKey("tokenId"))
-            nft.setTokenId(Integer.valueOf(map.get("tokenId").toString()));
+            nft.setTokenId(map.get("tokenId").toString());
         if (map.containsKey("name"))
             nft.setName(map.get("name").toString());
         if (map.containsKey("description"))
@@ -140,6 +140,7 @@ public class NFTData implements Data<NFT> {
 
         File folder = ANFT.getInstance().getFileManager().getNftsFolder();
         if (folder == null) return nfts;
+        if (folder.listFiles() == null) return nfts;
         for (File file : folder.listFiles()) {
             if (file.isDirectory()) continue;
             NFT nft = get(file);

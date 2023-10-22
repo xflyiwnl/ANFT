@@ -1,13 +1,16 @@
 groups:
   default:
+    id: 1
     name: "Обычный"
     limit: 2
     default: true
   premium:
+    id: 2
     name: "Премиум"
     limit: 3
     default: false
   admin:
+    id: 3
     name: "Админ"
     limit: -1
     default: false

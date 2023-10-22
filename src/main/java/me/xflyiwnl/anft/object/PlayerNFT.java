@@ -3,16 +3,13 @@ package me.xflyiwnl.anft.object;
 import me.xflyiwnl.anft.ANFT;
 import me.xflyiwnl.anft.ask.Ask;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 public class PlayerNFT implements Identifyable {
 
     private UUID uniqueId;
     private boolean verified = false;
-    private Group group;
-    private List<NFT> nfts = new ArrayList<NFT>();
+    private Map<String, NFT> nfts = new HashMap<String, NFT>();
     private List<Integer> rendered = new ArrayList<Integer>();
     private long cooldown = System.currentTimeMillis();
 
@@ -23,13 +20,11 @@ public class PlayerNFT implements Identifyable {
 
     public PlayerNFT(UUID uniqueId) {
         this.uniqueId = uniqueId;
-        this.group = ANFT.getInstance().getDefaultGroup();
     }
 
     public PlayerNFT(UUID uniqueId, boolean verified, Group group) {
         this.uniqueId = uniqueId;
         this.verified = verified;
-        this.group = group;
     }
 
     public void create(boolean save) {
@@ -47,19 +42,13 @@ public class PlayerNFT implements Identifyable {
     }
 
     public NFT getNFT(String id) {
-        for (NFT nft : nfts) {
-            if (nft.getId().equalsIgnoreCase(id)) {
-                return nft;
-            }
-        }
-        return null;
+        return nfts.get(id);
     }
 
     public boolean hasAsk() {
         return ask != null;
     }
 
-    public boolean hasGroup() {return group != null;}
 
     @Override
     public UUID getUniqueId() {
@@ -68,14 +57,6 @@ public class PlayerNFT implements Identifyable {
 
     public void setUniqueId(UUID uniqueId) {
         this.uniqueId = uniqueId;
-    }
-
-    public Group getGroup() {
-        return group;
-    }
-
-    public void setGroup(Group group) {
-        this.group = group;
     }
 
     public boolean isVerified() {
@@ -102,11 +83,11 @@ public class PlayerNFT implements Identifyable {
         this.ask = ask;
     }
 
-    public List<NFT> getNfts() {
+    public Map<String, NFT> getNfts() {
         return nfts;
     }
 
-    public void setNfts(List<NFT> nfts) {
+    public void setNfts(Map<String, NFT> nfts) {
         this.nfts = nfts;
     }
 

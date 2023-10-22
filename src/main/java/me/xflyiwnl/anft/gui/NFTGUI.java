@@ -2,8 +2,10 @@ package me.xflyiwnl.anft.gui;
 
 import me.xflyiwnl.anft.ANFT;
 import me.xflyiwnl.anft.object.BufferedNFT;
+import me.xflyiwnl.anft.object.Group;
 import me.xflyiwnl.anft.object.NFT;
 import me.xflyiwnl.anft.object.PlayerNFT;
+import me.xflyiwnl.anft.util.GroupUtil;
 import me.xflyiwnl.colorfulgui.builder.inventory.DynamicGuiBuilder;
 import me.xflyiwnl.colorfulgui.object.GuiItem;
 import me.xflyiwnl.colorfulgui.object.PaginatedGui;
@@ -96,11 +98,12 @@ public class NFTGUI extends ColorfulProvider<PaginatedGui> {
 
         PlayerNFT playerNFT = ANFT.getInstance().getPlayer(getPlayer().getUniqueId());
 
+        Group group = GroupUtil.getGroup(getPlayer());
         for (BufferedNFT nft : buffered) {
 
             boolean limit;
             String path;
-            if (playerNFT.getGroup().getLimit() != -1 && nfts.size() >= playerNFT.getGroup().getLimit()) {
+            if (group.getLimit() != -1 && nfts.size() >= group.getLimit()) {
                 path = "nft-item.limit.";
                 limit = true;
             } else {
@@ -110,7 +113,7 @@ public class NFTGUI extends ColorfulProvider<PaginatedGui> {
             String name = yaml.getString(path + "display-name")
                     .replace("%name%", nft.getName())
                     .replace("%token%", String.valueOf(nft.getTokenId()))
-                    .replace("%limit%", String.valueOf(playerNFT.getGroup().getLimit()));
+                    .replace("%limit%", String.valueOf(group.getLimit()));
             List<String> lore = new ArrayList<String>();
             yaml.getStringList(path + "lore").forEach(s -> {
                 if (s.contains("%description%")) {
@@ -137,7 +140,7 @@ public class NFTGUI extends ColorfulProvider<PaginatedGui> {
                 } else {
                     lore.add(s.replace("%name%", nft.getName())
                             .replace("%token%", String.valueOf(nft.getTokenId()))
-                            .replace("%limit%", String.valueOf(playerNFT.getGroup().getLimit())));
+                            .replace("%limit%", String.valueOf(group.getLimit())));
                 }
             });
             Material material = Material.valueOf(yaml.getString(path + "material").toUpperCase());
@@ -166,19 +169,20 @@ public class NFTGUI extends ColorfulProvider<PaginatedGui> {
         }
 
         PlayerNFT playerNFT = ANFT.getInstance().getPlayer(getPlayer().getUniqueId());
-        
+
+        Group group = GroupUtil.getGroup(getPlayer());
         for (String section : yaml.getConfigurationSection("items").getKeys(false)) {
 
             String path = "items." + section + ".";
 
             String name = yaml.getString(path + "display-name")
-                    .replace("%limit%", String.valueOf(playerNFT.getGroup().getLimit()))
-                    .replace("%status%", playerNFT.getGroup().getName());
+                    .replace("%limit%", String.valueOf(group.getLimit()))
+                    .replace("%status%", group.getName());
             List<String> lore = new ArrayList<String>();
             yaml.getStringList(path + "lore").forEach(s ->
                     lore.add(s
-                            .replace("%limit%", String.valueOf(playerNFT.getGroup().getLimit()))
-                    .replace("%status%", playerNFT.getGroup().getName())));
+                            .replace("%limit%", String.valueOf(group.getLimit()))
+                    .replace("%status%", group.getName())));
             int amount = yaml.getInt(path + "amount");
             Material material = Material.valueOf(yaml.getString(path + "material").toUpperCase());
             String mask = yaml.get(path + "mask") == null ? null : yaml.getString(path + "mask");

@@ -80,9 +80,6 @@ public final class ANFT extends JavaPlugin {
         getCommand("verify").setExecutor(new VerifyCommand());
         getCommand("verify").setTabCompleter(new VerifyCommand());
 
-        getCommand("nftgroup").setExecutor(new GroupCommand());
-        getCommand("nftgroup").setTabCompleter(new GroupCommand());
-
         getCommand("nftclean").setExecutor(new CleanCommand());
         getCommand("nftclean").setTabCompleter(new CleanCommand());
     }
@@ -166,11 +163,12 @@ public final class ANFT extends JavaPlugin {
         }
         for (String key : yaml.getConfigurationSection("groups").getKeys(false)) {
             String path = "groups." + key + ".";
+            int id = yaml.getInt(path + "id");
             String name = yaml.getString(path + "name");
             int limit = yaml.getInt(path + "limit");
             boolean isdefault = yaml.getBoolean(path + "default");
             Group group = new Group(
-                    name, limit, isdefault
+                    id, name, limit, isdefault
             );
             groups.put(name, group);
             if (group.isDefault()) {

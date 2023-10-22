@@ -6,6 +6,7 @@ import me.xflyiwnl.anft.object.nft.ImageNFT;
 import me.xflyiwnl.anft.object.nft.Point;
 import me.xflyiwnl.anft.render.NFTRenderer;
 import me.xflyiwnl.anft.util.ImageUtil;
+import me.xflyiwnl.anft.util.NFTUtil;
 import me.xflyiwnl.colorfulgui.util.TextUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -24,7 +25,7 @@ import java.util.UUID;
 
 public class NFT extends NFTObject implements Saveable {
 
-    private int tokenId;
+    private String tokenId;
     private String name;
     private String description;
 
@@ -48,7 +49,7 @@ public class NFT extends NFTObject implements Saveable {
         this.image = image;
     }
 
-    public NFT(String id, int w, int h, int tokenId, String name, String description, UUID owner, ImageNFT image) {
+    public NFT(String id, int w, int h, String tokenId, String name, String description, UUID owner, ImageNFT image) {
         super(id, w, h);
         this.tokenId = tokenId;
         this.name = name;
@@ -104,20 +105,20 @@ public class NFT extends NFTObject implements Saveable {
     public void remove() {
         for (UUID id : ANFT.getInstance().getPlayers().keySet()) {
             PlayerNFT playerNFT = ANFT.getInstance().getPlayer(id);
-            if (playerNFT.getNfts().contains(this)) {
-                playerNFT.getNfts().remove(this);
-                playerNFT.save();
-            }
+            NFT snft = playerNFT.getNFT(getId());
+            if (snft == null) continue;
+            playerNFT.getNfts().remove(getId());
+            playerNFT.save();
         }
         ANFT.getInstance().getNfts().remove(getId());
         ANFT.getInstance().getFlatFileSource().getNftData().remove(this);
     }
 
-    public int getTokenId() {
+    public String getTokenId() {
         return tokenId;
     }
 
-    public void setTokenId(int tokenId) {
+    public void setTokenId(String tokenId) {
         this.tokenId = tokenId;
     }
 

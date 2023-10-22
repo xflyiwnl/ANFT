@@ -34,18 +34,6 @@ public class PlayerData implements Data<PlayerNFT> {
         if (map.containsKey("verified"))
             player.setVerified(Boolean.valueOf(map.get("verified").toString()));
 
-        if (map.containsKey("group")) {
-            Group group = ANFT.getInstance().getGroup(map.get("group").toString());
-            if (group != null) {
-                player.setGroup(group);
-            }
-        } else {
-            Group group = ANFT.getInstance().getDefaultGroup();
-            if (group != null) {
-                player.setGroup(group);
-            }
-        }
-
         return player;
     }
 
@@ -61,9 +49,7 @@ public class PlayerData implements Data<PlayerNFT> {
         File folder = ANFT.getInstance().getFileManager().getPlayersFolder();
 
         if (folder == null) return players;
-
-        if (folder.listFiles().length == 0) return players;
-
+        if (folder.listFiles() == null) return players;
         for (File file : folder.listFiles()) {
             PlayerNFT player = get(file);
             if (player == null) continue;

@@ -26,11 +26,10 @@ public class PlayerSerialize implements Serialize<PlayerNFT> {
 
         map.put("uniqueId", playerNFT.getUniqueId().toString());
         map.put("verified", playerNFT.isVerified());
-        map.put("group", playerNFT.hasGroup() ? playerNFT.getGroup().getName() : "NOT HAVE GROUP");
         List<String> nfts = new ArrayList<String>();
-        playerNFT.getNfts().forEach(nft -> {
+        playerNFT.getNfts().forEach(((s, nft) -> {
             nfts.add(nft.getId());
-        });
+        }));
         map.put("nfts", nfts);
 
         return map;

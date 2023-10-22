@@ -160,6 +160,21 @@ public class NFTUtil {
             public void run() {
 
                 ImageNFT imageNFT = new ImageNFT(bufferedNFT.getUrl());
+
+                String sizeFormat = ImageUtil.getFormattedSize(imageNFT.getUrl());
+                if (sizeFormat == null) return;
+                String[] formattedSize = sizeFormat.split("x");
+                int width = Integer.parseInt(formattedSize[0]);
+                int height = Integer.parseInt(formattedSize[1]);
+                FileConfiguration s = ANFT.getInstance().getFileManager().getSettings().yaml();
+                if (width > s.getInt("settings.image-size-limit.w") &&
+                        height > s.getInt("settings.image-size-limit.h")) {
+                    new MessageSender(player)
+                            .path("image-size-limit")
+                            .run();
+                    return;
+                }
+
                 BufferedImage image = imageNFT.load();
 
                 if (image == null) {
@@ -167,15 +182,6 @@ public class NFTUtil {
                             .path("response-error")
                             .replace("code", "?")
                             .replace("description", "???")
-                            .run();
-                    return;
-                }
-
-                FileConfiguration s = ANFT.getInstance().getFileManager().getSettings().yaml();
-                if (image.getWidth() > s.getInt("settings.image-size-limit.w") &&
-                image.getHeight() > s.getInt("settings.image-size-limit.h")) {
-                    new MessageSender(player)
-                            .path("image-size-limit")
                             .run();
                     return;
                 }
@@ -192,7 +198,7 @@ public class NFTUtil {
                 }
                 nft.getImage().setImage(path);
 
-                playerNFT.getNfts().add(nft);
+                playerNFT.getNfts().put(nft.getId(), nft);
                 playerNFT.save();
 
 
@@ -246,7 +252,7 @@ public class NFTUtil {
      *  Генерация айди из адреса и токена
      */
 
-    public static String generateId(String address, int tokenId) {
+    public static String generateId(String address, String tokenId) {
         return address + "-" + tokenId;
     }
 

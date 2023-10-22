@@ -25,7 +25,7 @@ public class FlatFileSource implements DataSource {
             if (playerNFT == null) {
                 return;
             }
-            playerNFT.getNfts().add(nft);
+            playerNFT.getNfts().put(nft.getId(), nft);
         });
 
         ANFT.getInstance().checkPlayers();

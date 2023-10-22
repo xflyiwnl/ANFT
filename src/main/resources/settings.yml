@@ -1,6 +1,7 @@
 settings:
 
   web-server: "http://80.87.106.191:3000"
+  verification: enabled
 
   deny-messages:
     - "отмена"

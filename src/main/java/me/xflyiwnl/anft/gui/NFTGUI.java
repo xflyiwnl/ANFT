@@ -1,10 +1,7 @@
 package me.xflyiwnl.anft.gui;
 
 import me.xflyiwnl.anft.ANFT;
-import me.xflyiwnl.anft.object.BufferedNFT;
-import me.xflyiwnl.anft.object.Group;
-import me.xflyiwnl.anft.object.NFT;
-import me.xflyiwnl.anft.object.PlayerNFT;
+import me.xflyiwnl.anft.object.*;
 import me.xflyiwnl.anft.util.GroupUtil;
 import me.xflyiwnl.colorfulgui.builder.inventory.DynamicGuiBuilder;
 import me.xflyiwnl.colorfulgui.object.GuiItem;
@@ -43,12 +40,15 @@ public class NFTGUI extends ColorfulProvider<PaginatedGui> {
 
     public void nfts() {
 
+        String yes = Translator.of("yes");
+        String no = Translator.of("no");
+
         for (NFT nft : nfts) {
 
             String path = "nft-item.loaded.";
             String name = yaml.getString(path + "display-name")
                     .replace("%name%", nft.getName())
-                    .replace("%placed%", nft.isPlaced() ? "Да" : "Нет")
+                    .replace("%placed%", nft.isPlaced() ? yes : no)
                     .replace("%token%", String.valueOf(nft.getTokenId()));
             List<String> lore = new ArrayList<String>();
             yaml.getStringList(path + "lore").forEach(s -> {
@@ -75,7 +75,7 @@ public class NFTGUI extends ColorfulProvider<PaginatedGui> {
                     }
                 } else {
                     lore.add(s.replace("%name%", nft.getName())
-                            .replace("%placed%", nft.isPlaced() ? "Да" : "Нет")
+                            .replace("%placed%", nft.isPlaced() ? yes : no)
                             .replace("%token%", String.valueOf(nft.getTokenId())));
                 }
             });

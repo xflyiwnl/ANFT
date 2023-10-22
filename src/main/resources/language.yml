@@ -1,5 +1,8 @@
 language:
 
+  yes: "#008669Да"
+  no: "&cНет"
+
   nft-loading: "#008669&lNFT &7▪ &fПодождите, NFT загружаются"
   empty-nfts: "#008669&lNFT &7▪ &fСписок NFT пуст"
 

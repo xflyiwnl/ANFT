@@ -40,8 +40,8 @@ public class NFTGUI extends ColorfulProvider<PaginatedGui> {
 
     public void nfts() {
 
-        String yes = Translator.of("yes");
-        String no = Translator.of("no");
+        String yes = Translator.of("yes-placeholder");
+        String no = Translator.of("no-placeholder");
 
         for (NFT nft : nfts) {
 

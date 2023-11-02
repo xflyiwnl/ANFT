@@ -2,6 +2,7 @@ package me.xflyiwnl.anft;
 
 import me.xflyiwnl.anft.command.*;
 import me.xflyiwnl.anft.database.FlatFileSource;
+import me.xflyiwnl.anft.database.data.PlayerData;
 import me.xflyiwnl.anft.listener.ChunkListener;
 import me.xflyiwnl.anft.listener.MapListener;
 import me.xflyiwnl.anft.listener.PlayerListener;
@@ -17,6 +18,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.*;
 
@@ -93,6 +95,19 @@ public final class ANFT extends JavaPlugin {
         pm.registerEvents(new MapListener(), this);
         pm.registerEvents(new PlayerListener(), this);
         pm.registerEvents(new ChunkListener(), this);
+    }
+
+    public PlayerNFT loadPlayer(UUID uniqueId) {
+        PlayerData playerData = getFlatFileSource().getPlayerData();
+        PlayerNFT playerNFT = null;
+        if (playerData.exists(uniqueId)) {
+            playerNFT = playerData.get(uniqueId);
+            playerNFT.create(false);
+        } else {
+            playerNFT = new PlayerNFT(uniqueId);
+            playerNFT.create(true);
+        }
+        return playerNFT;
     }
 
     /*
@@ -186,11 +201,7 @@ public final class ANFT extends JavaPlugin {
 
     public void checkPlayers() {
         for (Player player : Bukkit.getOnlinePlayers()) {
-            PlayerNFT playerNFT = ANFT.getInstance().getPlayer(player.getUniqueId());
-            if (playerNFT == null) {
-                playerNFT = new PlayerNFT(player.getUniqueId());
-                playerNFT.create(true);
-            }
+            PlayerNFT playerNFT = ANFT.getInstance().loadPlayer(player.getUniqueId());
         }
     }
 

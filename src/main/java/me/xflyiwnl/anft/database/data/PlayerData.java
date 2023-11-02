@@ -34,6 +34,7 @@ public class PlayerData implements Data<PlayerNFT> {
         if (map.containsKey("verified"))
             player.setVerified(Boolean.valueOf(map.get("verified").toString()));
 
+
         return player;
     }
 

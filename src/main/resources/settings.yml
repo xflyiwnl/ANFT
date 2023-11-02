@@ -8,13 +8,13 @@ settings:
     - "deny"
 
   nft-item:
-    display-name: "#008669%name%"
+    display-name: "&3%name%"
     lore:
       - " "
-      - " &fТокен: #008669%token%"
+      - " &fТокен: &3%token%"
       - " "
-      - " &fВысота: #008669%height%"
-      - " &fВысота: #008669%width%"
+      - " &fВысота: &3%height%"
+      - " &fВысота: &3%width%"
       - " "
 
   cooldown: 10

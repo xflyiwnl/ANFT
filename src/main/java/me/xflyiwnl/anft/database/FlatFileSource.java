@@ -17,7 +17,7 @@ public class FlatFileSource implements DataSource {
     public void load() {
         this.manager = ANFT.getInstance().getFileManager();
 
-        playerData.load();
+//        playerData.load();
         nftData.load();
 
         ANFT.getInstance().getNfts().forEach((s, nft) -> {

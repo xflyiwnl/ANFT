@@ -17,11 +17,7 @@ public class PlayerListener implements Listener {
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
-        PlayerNFT playerNFT = ANFT.getInstance().getPlayer(player.getUniqueId());
-        if (playerNFT == null) {
-            playerNFT = new PlayerNFT(player.getUniqueId());
-            playerNFT.create(true);
-        }
+        PlayerNFT playerNFT = ANFT.getInstance().loadPlayer(player.getUniqueId());
     }
 
     @EventHandler
@@ -31,6 +27,7 @@ public class PlayerListener implements Listener {
         HashedNFT hashedNFT = ANFT.getInstance().getHashedNFT(player.getUniqueId());
         if (playerNFT != null) {
             playerNFT.getRendered().clear();
+            ANFT.getInstance().getPlayers().remove(player.getUniqueId());
         }
         if (hashedNFT != null) {
             hashedNFT.remove();
